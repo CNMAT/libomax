@@ -162,6 +162,11 @@ int omax_util_resolveDictStubs(void)
 			if(!omax_util_dictobj_release){
 				return 0;
 			}
+
+			omax_util_dictobj_register = CFBundleGetFunctionPointerForName(maxapi_bundle_ref, CFSTR("dictobj_register"));
+			if(!omax_util_dictobj_register){
+				return 0;
+			}
 			/*
 			  The above file explicitly loads each function to a typed function pointer like the following:
 			  pf_cgCreateContext = CFBundleGetFunctionPointerForName(g_cg_bundle_ref, CFSTR("cgCreateContext"));

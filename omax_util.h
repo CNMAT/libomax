@@ -38,9 +38,13 @@ extern "C" {
 #endif
 
 #define OMAX_UTIL_DICTIONARY(obj_type, obj, fp)				\
-	void omax_util_dictionary(obj_type *obj, t_symbol *name){	\
+	void omax_util_dictionary(obj_type *obj, t_symbol *name, int argc, t_atom *argv){ \
 		omax_util_processDictionary((void *)obj, name, (void (*)(void *, long, long))fp); \
 	}
+
+#ifndef WIN_VERSION
+t_dictionary *(*omax_util_dictobj_register)(t_dictionary *d, t_symbol **name);
+#endif
 
 int omax_util_resolveDictStubs(void);
 void omax_util_dictionaryToOSC(t_dictionary *dict, t_osc_bndl_u *bndl_u);
