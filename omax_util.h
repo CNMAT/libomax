@@ -38,8 +38,17 @@ extern "C" {
 #endif
 
 #define OMAX_UTIL_DICTIONARY(obj_type, obj, fp)				\
-	void omax_util_dictionary(obj_type *obj, t_symbol *name, int argc, t_atom *argv){ \
-		omax_util_processDictionary((void *)obj, name, (void (*)(void *, long, long))fp); \
+	void omax_util_dictionary(obj_type *obj, t_symbol *msg, int argc, t_atom *argv){ \
+		if(argc != 1){ \
+			object_error((t_object *)obj, "expected 1 argument to message dictionary but got %d", argc);	\
+			return;\
+		}		\
+		if(atom_gettype(argv) != A_SYM){			\
+			object_error((t_object *)obj, "the argument to the message dictionary should be a symbol"); \
+			return;						\
+		}							\
+		t_symbol *name = atom_getsym(argv);			\
+		omax_util_processDictionary((void *)obj, name, (void (*)(void *, t_symbol*, int, t_atom*))fp); \
 	}
 
 #ifndef WIN_VERSION
@@ -48,7 +57,7 @@ t_dictionary *(*omax_util_dictobj_register)(t_dictionary *d, t_symbol **name);
 
 int omax_util_resolveDictStubs(void);
 void omax_util_dictionaryToOSC(t_dictionary *dict, t_osc_bndl_u *bndl_u);
-void omax_util_processDictionary(void *x, t_symbol *name, void (*fp)(void *x, long len, long ptr));
+void omax_util_processDictionary(void *x, t_symbol *name, void (*fp)(void *x, t_symbol *msg, int argc, t_atom *argv));
 void omax_util_bundleToDictionary(t_osc_bndl_s *bndl, t_dictionary *dict);
 void omax_util_outletOSC(void *outlet, long len, char *ptr);
 void omax_util_maxFullPacketToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *len, t_atom *ptr);

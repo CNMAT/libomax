@@ -235,7 +235,7 @@ void omax_util_dictionaryToOSC(t_dictionary *dict, t_osc_bndl_u *bndl_u)
 	dictionary_freekeys(dict, nkeys, keys);
 }
 
-void omax_util_processDictionary(void *x, t_symbol *name, void (*fp)(void *x, long len, long ptr))
+void omax_util_processDictionary(void *x, t_symbol *name, void (*fp)(void *x, t_symbol *msg, int argc, t_atom *argv))
 {
 #ifdef WIN_VERSION
 	t_dictionary *dict = dictobj_findregistered_retain(name);
@@ -247,7 +247,10 @@ void omax_util_processDictionary(void *x, t_symbol *name, void (*fp)(void *x, lo
 	long len = 0;
 	char *bndl = NULL;
 	osc_bundle_u_serialize(bndl_u, &len, &bndl);
-	fp(x, len, (long)bndl);
+	t_atom a[2];
+	atom_setlong(a, len);
+	atom_setlong(a + 1, (long)bndl);
+	fp(x, NULL, 2, a);
 	osc_bundle_u_free(bndl_u);
 	osc_mem_free(bndl);
 #ifdef WIN_VERSION
