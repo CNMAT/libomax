@@ -29,7 +29,25 @@
 #define __OMAX_UTIL_H__
 
 #include "osc.h"
+#ifndef ulong
+#define ulong
+#endif
+#ifndef uint
+#define uint
+#endif
+#ifndef ushort
+#define ushort
+#endif
 #include "ext.h"
+#ifdef ulong
+#undef ulong
+#endif
+#ifdef uint
+#undef uint
+#endif
+#ifdef ushort
+#define ushort
+#endif
 #include "ext_obex.h"
 #include "osc_message_s.h"
 

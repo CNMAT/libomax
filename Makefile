@@ -8,10 +8,10 @@ MAX_INCLUDES = $(C74SUPPORT)/max-includes
 
 MAC_SYSROOT = MacOSX10.8.sdk 
 MAC-CFLAGS = -arch i386 -O3 -funroll-loops -isysroot /Developer/SDKs/$(MAC_SYSROOT) -mmacosx-version-min=10.5
-WIN-CFLAGS = -O3 -funroll-loops -DWIN_VERSION -DWIN_EXT_VERSION -U__STRICT_ANSI__ -U__ANSI_SOURCE -std=c99
+WIN-CFLAGS = -O3 -funroll-loops -mno-cygwin -DWIN_VERSION -DWIN_EXT_VERSION -U__STRICT_ANSI__ -U__ANSI_SOURCE -std=c99
 
 MAC-INCLUDES = -I$(MAX_INCLUDES) -I../libo -F/System/Library/Frameworks -I/usr/include
-WIN-INCLUDES = -I../../../../c74support/max-includes -I../libo
+WIN-INCLUDES = -I$(MAX_INCLUDES) -I../libo -I/usr/include
 
 all: CFLAGS += $(MAC-CFLAGS)
 all: CC = clang
@@ -20,7 +20,8 @@ all: $(LIBO_CFILES) $(LIBO_HFILES) libomax.a
 all: LIBTOOL = libtool -static -o libomax.a $(OMAX_OBJECTS)
 
 win: CFLAGS += $(WIN-CFLAGS)
-win: CC = gcc
+win: CC = i686-w64-mingw32-gcc
+#win: CC = gcc
 win: I = $(WIN-INCLUDES)
 win: $(LIBO_CFILES) $(LIBO_HFILES) libomax.a
 win: LIBTOOL = ar cru libomax.a $(OMAX_OBJECTS)
