@@ -37,6 +37,30 @@
 extern "C" {
 #endif
 
+// this is a workaround for a bug in Max.  the function that passes arguments to functions
+// declared with static types (ie, not with A_GIMME) is not thread safe.  This has been fixed in
+// max 6, but not in earlier versions.
+#define OMAX_UTIL_GET_LEN_AND_PTR \
+	if(argc != 2){\
+		object_error((t_object *)x, "%s: expected 2 arguments but got %d", __func__, argc);\
+		return;\
+	}\
+	if(atom_gettype(argv) != A_LONG){\
+		object_error((t_object *)x, "%s: argument 1 should be an int", __func__);\
+		return;\
+	}\
+	if(atom_gettype(argv + 1) != A_LONG){\
+		object_error((t_object *)x, "%s: argument 2 should be an int", __func__);\
+		return;\
+	}\
+	long len = atom_getlong(argv);\
+	long ptr = atom_getlong(argv + 1);
+
+// that stupid macro above used to be defined in osc.h.  I moved it here but 
+// was too lazy to change all the files that used it, so we have this #define below.
+// As I visit each of the files, I'll change it and then this can be removed...
+#define OSC_GET_LEN_AND_PTR OMAX_UTIL_GET_LEN_AND_PTR
+
 #define OMAX_UTIL_DICTIONARY(obj_type, obj, fp)				\
 	void omax_util_dictionary(obj_type *obj, t_symbol *msg, int argc, t_atom *argv){ \
 		if(argc != 1){ \

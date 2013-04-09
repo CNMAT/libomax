@@ -120,17 +120,19 @@ int omax_util_resolveDictStubs(void)
 	}
 	omax_util_dictStubsResolved = 1;
 	char *frameworkpath = NULL;
-	short majorversion = maxversion() & 0xF00;
-	switch(majorversion){
-	case 0x600:
+	short version = maxversion();
+
+	// I don't think this will work for standalones
+	if((version & 0xFF0) == 0x610){
+		frameworkpath = "/Applications/Max 6.1/Max.app/Contents/Frameworks/MaxAPI.framework";
+	}else if((version & 0xFF0) == 0x600){
 		frameworkpath = "/Applications/Max6/Max.app/Contents/Frameworks/MaxAPI.framework";
-		break;
-	case 0x500:
+	}else if((version & 0xF00) == 0x500){
 		frameworkpath = "/Applications/Max5/MaxMSP.app/Contents/Frameworks/MaxAPI.framework";
-		break;
-	default:
+	}else{
 		return 0;
 	}
+
 	int frameworkpath_len = strlen(frameworkpath);
 	OSStatus err;
 	short path;
