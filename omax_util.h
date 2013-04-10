@@ -93,9 +93,9 @@ extern "C" {
 		omax_util_processDictionary((void *)obj, name, (void (*)(void *, t_symbol*, int, t_atom*))fp); \
 	}
 
-#ifndef WIN_VERSION
+  //#ifndef WIN_VERSION
 t_dictionary *(*omax_util_dictobj_register)(t_dictionary *d, t_symbol **name);
-#endif
+  //#endif
 
 int omax_util_resolveDictStubs(void);
 void omax_util_dictionaryToOSC(t_dictionary *dict, t_osc_bndl_u *bndl_u);
