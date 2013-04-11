@@ -50,18 +50,19 @@
 //#define __ODOT_PROFILE__
 //#include "osc_profile.h"
 
-#ifndef WIN_VERSION
+//#ifndef WIN_VERSION
 static int omax_util_haveDict;
 static int omax_util_dictStubsResolved;
 static t_dictionary *(*omax_util_dictobj_findregistered_retain)(t_symbol *name);
 static t_max_err (*omax_util_dictobj_release)(t_dictionary *d);
-#endif
+//#endif
 
 t_symbol *omax_ps_FullPacket = NULL;
 
 #ifdef WIN_VERSION
 int omax_util_resolveDictStubs(void)
 {
+  return 0;
 /*
 
 something like this, i assume

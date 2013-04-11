@@ -30,7 +30,25 @@
 
 #include "osc.h"
 #include "ext.h"
+#ifndef ulong
+#define ulong
+#endif
+#ifndef uint
+#define uint
+#endif
+#ifndef ushort
+#define ushort
+#endif
 #include "ext_obex.h"
+#ifdef ulong
+#undef ulong
+#endif
+#ifdef uint
+#undef uint
+#endif
+#ifdef ushort
+#define ushort
+#endif
 #include "osc_message.h"
 #include "osc_message_s.h"
 
