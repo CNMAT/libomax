@@ -70,6 +70,9 @@ typedef struct _omax_method{
 	void *thing;
 } t_omax_method;
 
+#ifndef MAXARG
+#define MAXARG 9
+#endif
 
 #define OMAX_ADDMETHOD(c, functionpointer, name, ...)\
 	OMAX_ADDMETHOD_OSCNAME(c, functionpointer, name, omax_class_makeMethodNameOSC(class_nameget(c)->s_name, name)->s_name, __VA_ARGS__)
