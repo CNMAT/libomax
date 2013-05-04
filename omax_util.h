@@ -79,7 +79,7 @@ extern "C" {
 		return;\
 	}\
 	long len = *((long *)&(argv->a_w.w_float));	\
-	PD_LONGINTTYPE ptr = (PD_LONGINTTYPE)(argv[1].a_w.w_pointer);
+	PD_LONGINTTYPE ptr = (PD_LONGINTTYPE)(argv[1].a_w.w_symbol);
 #else
 #define OMAX_UTIL_GET_LEN_AND_PTR \
 	if(argc != 2){\

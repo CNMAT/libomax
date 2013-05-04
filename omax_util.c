@@ -84,7 +84,8 @@ void omax_util_outletOSC(void *outlet, long len, char *ptr)
 #ifdef OMAX_PD_VERSION
 	uint32_t l = (uint32_t)len;
 	SETFLOAT(out, *((t_float *)&l));
-	SETPOINTER(out + 1, ptr);
+	//SETPOINTER(out + 1, ptr);
+	out[1].a_w.w_symbol = (t_symbol *)ptr;
 #else
 	atom_setlong(out, len);
 	atom_setlong(out + 1, (long)ptr);
