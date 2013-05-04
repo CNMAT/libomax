@@ -58,6 +58,23 @@ extern "C" {
 // this is a workaround for a bug in Max.  the function that passes arguments to functions
 // declared with static types (ie, not with A_GIMME) is not thread safe.  This has been fixed in
 // max 6, but not in earlier versions.
+#ifdef OMAX_PD_VERSION
+#define OMAX_UTIL_GET_LEN_AND_PTR \
+	if(argc != 2){\
+		error("%s: expected 2 arguments but got %d", __func__, argc);\
+		return;\
+	}\
+	if(argv->a_type != A_FLOAT){\
+		object_error((t_object *)x, "%s: argument 1 should be a float", __func__);\
+		return;\
+	}\
+	if(argv[1].a_type != A_POINTER){\
+		error("%s: argument 2 should be a pointer", __func__);\
+		return;\
+	}\
+	long len = *((long *)&(argv->a_w.w_float));	\
+	PD_LONGINTTYPE ptr = (PD_LONGINTTYPE)(argv[1].a_w.w_pointer);
+#else
 #define OMAX_UTIL_GET_LEN_AND_PTR \
 	if(argc != 2){\
 		object_error((t_object *)x, "%s: expected 2 arguments but got %d", __func__, argc);\
@@ -73,6 +90,7 @@ extern "C" {
 	}\
 	long len = atom_getlong(argv);\
 	long ptr = atom_getlong(argv + 1);
+#endif
 
 // that stupid macro above used to be defined in osc.h.  I moved it here but 
 // was too lazy to change all the files that used it, so we have this #define below.

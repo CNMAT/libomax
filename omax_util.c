@@ -81,8 +81,14 @@ void omax_util_outletOSC(void *outlet, long len, char *ptr)
 		omax_util_ps_FullPacket = gensym("FullPacket");
 	}
 	t_atom out[2];
+#ifdef OMAX_PD_VERSION
+	uint32_t l = (uint32_t)len;
+	SETFLOAT(out, *((t_float *)&l));
+	SETPOINTER(out + 1, ptr);
+#else
 	atom_setlong(out, len);
 	atom_setlong(out + 1, (long)ptr);
+#endif
 	outlet_anything(outlet, omax_util_ps_FullPacket, 2, out);
 }
 
