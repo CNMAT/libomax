@@ -29,7 +29,14 @@
 #define __OMAX_DOC_H__
 
 #include "osc.h"
+
+#ifdef OMAX_PD_VERSION
+#include "m_pd.h"
+#else
 #include "ext.h"
+#include "ext_obex.h"
+#endif
+
 #ifndef ulong
 #define ulong
 #endif
@@ -39,7 +46,7 @@
 #ifndef ushort
 #define ushort
 #endif
-#include "ext_obex.h"
+
 #ifdef ulong
 #undef ulong
 #endif

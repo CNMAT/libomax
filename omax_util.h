@@ -38,7 +38,14 @@
 #ifndef ushort
 #define ushort
 #endif
+
+#ifdef OMAX_PD_VERSION
+#include "m_pd.h"
+#else //MAXVERSION
 #include "ext.h"
+#include "ext_obex.h"
+#endif
+
 #ifdef ulong
 #undef ulong
 #endif
@@ -48,7 +55,6 @@
 #ifdef ushort
 #define ushort
 #endif
-#include "ext_obex.h"
 #include "osc_message_s.h"
 
 #ifdef __cplusplus
