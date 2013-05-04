@@ -65,6 +65,7 @@ extern "C" {
 // declared with static types (ie, not with A_GIMME) is not thread safe.  This has been fixed in
 // max 6, but not in earlier versions.
 #ifdef OMAX_PD_VERSION
+#define critical_enter(x)
 #define OMAX_UTIL_GET_LEN_AND_PTR \
 	if(argc != 2){\
 		error("%s: expected 2 arguments but got %d", __func__, argc);\
