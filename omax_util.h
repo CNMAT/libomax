@@ -71,11 +71,11 @@ extern "C" {
 		return;\
 	}\
 	if(argv->a_type != A_FLOAT){\
-		object_error((t_object *)x, "%s: argument 1 should be a float", __func__);\
+		error("%s: argument 1 should be a float", __func__);\
 		return;\
 	}\
-	if(argv[1].a_type != A_POINTER){\
-		error("%s: argument 2 should be a pointer", __func__);\
+	if(argv[1].a_type != A_SYMBOL){\
+		error("%s: argument 2 should be a symbol", __func__);\
 		return;\
 	}\
 	long len = *((long *)&(argv->a_w.w_float));	\
