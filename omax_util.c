@@ -137,7 +137,7 @@ void omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 			break;
 		case 'f':
 		case 'd':
-			atom_setfloat(ptr++, osc_atom_s_getFloat(a));
+			atom_setfloat(ptr++, osc_atom_s_getFloat(a)); 
 			break;
 		case 's':		
 			{
