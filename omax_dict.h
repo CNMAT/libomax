@@ -28,6 +28,10 @@
 #ifndef __OMAX_DICT_H__
 #define __OMAX_DICT_H__
 
+#ifdef OMAX_PD_VERSION
+//no dictionaries in pd
+#else
+
 #include "osc.h"
 #include "osc_bundle_u.h"
 
@@ -81,6 +85,8 @@ void omax_dict_bundleToDictionary(t_osc_bndl_s *bndl, t_dictionary *dict);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif

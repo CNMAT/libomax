@@ -29,17 +29,14 @@
 #define __OMAX_CLASS_H__
 
 #include "osc.h"
+
+#ifdef OMAX_PD_VERSION
+//nothing included in PD version
+#else //MAXVERSION
+
 #include "ext.h"
-#ifndef ulong
-#define ulong
-#endif
-#ifndef uint
-#define uint
-#endif
-#ifndef ushort
-#define ushort
-#endif
 #include "ext_obex.h"
+
 #ifdef ulong
 #undef ulong
 #endif
@@ -152,6 +149,8 @@ method omax_object_getNotificationCallback(t_object *ob);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif

@@ -46,6 +46,21 @@
 #include "osc_atom_s.h"
 #include "omax_util.h"
 
+
+#ifdef OMAX_PD_VERSION
+
+#define A_LONG -666
+#define A_SYM A_SYMBOL
+
+extern void atom_setfloat(t_atom *atom, t_float f);
+extern void atom_setlong(t_atom *atom, long l);
+extern void atom_setsym(t_atom *atom, t_symbol *s);
+extern t_int atom_getlong(t_atom *atom);
+extern t_symbol *atom_getsym(t_atom *atom);
+extern t_atomtype atom_gettype(t_atom *atom);
+#endif
+
+
 t_symbol *omax_util_ps_FullPacket = NULL;
 
 
@@ -85,7 +100,15 @@ void omax_util_outletOSC(void *outlet, long len, char *ptr)
 	uint32_t l = (uint32_t)len;
 	SETFLOAT(out, *((t_float *)&l));
 	//SETPOINTER(out + 1, ptr);
+    
+    //changed t_symbol pointer method, not sure why this is necessary.
+    t_symbol s;
+    s.s_name = ptr;
+    SETSYMBOL(out+1, &s);
+    /* this crashes, not sure exactly why, maybe the s_name being null?
 	out[1].a_w.w_symbol = (t_symbol *)ptr;
+    out[1].a_type = A_SYMBOL;
+     */
 #else
 	atom_setlong(out, len);
 	atom_setlong(out + 1, (long)ptr);
@@ -138,6 +161,9 @@ void omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 		case 'f':
 		case 'd':
 			atom_setfloat(ptr++, osc_atom_s_getFloat(a));
+//            ptr->a_type = A_FLOAT;
+//            ptr->a_w.w_float = osc_atom_s_getFloat(a);
+//            ptr++;
 			break;
 		case 's':		
 			{

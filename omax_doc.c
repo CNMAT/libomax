@@ -25,6 +25,10 @@
 
 */
 
+#ifdef OMAX_PD_VERSION
+//no assist currently in pd
+#else
+
 #ifndef WIN_VERSION
 #include <Carbon/Carbon.h>
 #include <CoreServices/CoreServices.h>
@@ -140,3 +144,5 @@ void _omax_doc_assist(long io,
 		break;
 	}
 }
+
+#endif

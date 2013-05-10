@@ -46,6 +46,8 @@
 #include "ext_obex.h"
 #endif
 
+//#include "o.h" << required in all objects
+
 #ifdef ulong
 #undef ulong
 #endif
@@ -64,45 +66,7 @@ extern "C" {
 // this is a workaround for a bug in Max.  the function that passes arguments to functions
 // declared with static types (ie, not with A_GIMME) is not thread safe.  This has been fixed in
 // max 6, but not in earlier versions.
-#ifdef OMAX_PD_VERSION
-#define critical_enter(x)
-#define OMAX_UTIL_GET_LEN_AND_PTR \
-	if(argc != 2){\
-		error("%s: expected 2 arguments but got %d", __func__, argc);\
-		return;\
-	}\
-	if(argv->a_type != A_FLOAT){\
-		error("%s: argument 1 should be a float", __func__);\
-		return;\
-	}\
-	if(argv[1].a_type != A_SYMBOL){\
-		error("%s: argument 2 should be a symbol", __func__);\
-		return;\
-	}\
-	long len = *((long *)&(argv->a_w.w_float));	\
-	PD_LONGINTTYPE ptr = (PD_LONGINTTYPE)(argv[1].a_w.w_symbol);
-#else
-#define OMAX_UTIL_GET_LEN_AND_PTR \
-	if(argc != 2){\
-		object_error((t_object *)x, "%s: expected 2 arguments but got %d", __func__, argc);\
-		return;\
-	}\
-	if(atom_gettype(argv) != A_LONG){\
-		object_error((t_object *)x, "%s: argument 1 should be an int", __func__);\
-		return;\
-	}\
-	if(atom_gettype(argv + 1) != A_LONG){\
-		object_error((t_object *)x, "%s: argument 2 should be an int", __func__);\
-		return;\
-	}\
-	long len = atom_getlong(argv);\
-	long ptr = atom_getlong(argv + 1);
-#endif
 
-// that stupid macro above used to be defined in osc.h.  I moved it here but 
-// was too lazy to change all the files that used it, so we have this #define below.
-// As I visit each of the files, I'll change it and then this can be removed...
-#define OSC_GET_LEN_AND_PTR OMAX_UTIL_GET_LEN_AND_PTR
 
 void omax_util_outletOSC(void *outlet, long len, char *ptr);
 void omax_util_maxFullPacketToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *len, t_atom *ptr);
@@ -113,6 +77,8 @@ void omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av);
 
 int omax_util_liboErrorHandler(const char * const errorstr);
 
+    
+    
 #ifdef __cplusplus
 }
 #endif

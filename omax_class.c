@@ -24,6 +24,8 @@
 	\author John MacCallum
 
 */
+#ifdef OMAX_PD_VERSION
+#else
 
 #ifndef WIN_VERSION
 #include <Carbon/Carbon.h>
@@ -719,3 +721,5 @@ method omax_object_getNotificationCallback(t_object *ob)
 	hashtab_lookup(ht, gensym("cnmat_internal_osc_notification_function"), (t_object **)(&f));
 	return f;
 }
+
+#endif

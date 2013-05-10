@@ -31,11 +31,10 @@
 #include "osc.h"
 
 #ifdef OMAX_PD_VERSION
-#include "m_pd.h"
+//#include "m_pd.h" //CURRENTLY THIS IS ALL COMMENTED OUT IN PD
 #else
 #include "ext.h"
 #include "ext_obex.h"
-#endif
 
 #ifndef ulong
 #define ulong
@@ -150,3 +149,6 @@ void _omax_doc_assist(long io,
 #endif
 
 #endif 
+
+#endif
+

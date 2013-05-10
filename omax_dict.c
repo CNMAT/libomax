@@ -25,6 +25,11 @@
 
 */
 
+#ifdef OMAX_PD_VERSION
+//no dicts in pd
+#else
+
+
 #ifndef WIN_VERSION
 #include <Carbon/Carbon.h>
 #include <CoreServices/CoreServices.h>
@@ -332,3 +337,4 @@ void omax_dict_bundleToDictionary(t_osc_bndl_s *bndl, t_dictionary *dict)
 	osc_bndl_it_s_destroy(it);
 }
 
+#endif
