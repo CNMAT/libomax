@@ -96,13 +96,10 @@ extern "C" {
 		return;\
 	}\
 	long len = atom_getlong(argv);\
-	long ptr = atom_getlong(argv + 1);
+	char *ptr = (char *)atom_getlong(argv + 1);
 #endif
 
-// that stupid macro above used to be defined in osc.h.  I moved it here but 
-// was too lazy to change all the files that used it, so we have this #define below.
-// As I visit each of the files, I'll change it and then this can be removed...
-#define OSC_GET_LEN_AND_PTR OMAX_UTIL_GET_LEN_AND_PTR
+
 
 void omax_util_outletOSC(void *outlet, long len, char *ptr);
 void omax_util_maxFullPacketToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *len, t_atom *ptr);
