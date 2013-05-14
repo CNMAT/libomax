@@ -46,8 +46,6 @@
 #include "ext_obex.h"
 #endif
 
-//#include "o.h" << required in all objects
-
 #ifdef ulong
 #undef ulong
 #endif
@@ -63,10 +61,6 @@
 extern "C" {
 #endif
 
-// this is a workaround for a bug in Max.  the function that passes arguments to functions
-// declared with static types (ie, not with A_GIMME) is not thread safe.  This has been fixed in
-// max 6, but not in earlier versions.
-
 
 void omax_util_outletOSC(void *outlet, long len, char *ptr);
 void omax_util_maxFullPacketToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *len, t_atom *ptr);
@@ -77,8 +71,6 @@ void omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av);
 
 int omax_util_liboErrorHandler(const char * const errorstr);
 
-    
-    
 #ifdef __cplusplus
 }
 #endif

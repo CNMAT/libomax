@@ -32,7 +32,6 @@
 #include <windows.h>
 #endif
 
-#include <stdint.h>
 #include <inttypes.h>
 #include "osc.h"
 #include "osc_mem.h"
@@ -60,7 +59,6 @@ extern t_int atom_getlong(t_atom *atom);
 extern t_symbol *atom_getsym(t_atom *atom);
 extern t_atomtype atom_gettype(t_atom *atom);
 #endif
-
 
 t_symbol *omax_util_ps_FullPacket = NULL;
 
@@ -91,11 +89,11 @@ int omax_util_liboErrorHandler(const char * const errorstr)
 	return 0;
 }
 
-
-void omax_util_lenAndPtr2Atoms(t_atom *out, int *numatoms, long len, char *ptr)
+void omax_util_oscLenAndPtr2Atoms(t_atom *a, long *argc, long len, char *ptr)
 {
 #ifdef OMAX_PD_VERSION
-    *numatoms = 3;
+    t_atom out[3];
+    *argc = 3;
 	uint32_t l = (uint32_t)len;
 	SETFLOAT(out, *((t_float *)&l));
     
@@ -108,27 +106,25 @@ void omax_util_lenAndPtr2Atoms(t_atom *out, int *numatoms, long len, char *ptr)
     SETFLOAT(out+2, f1);
     
 #else
-    *numatoms = 2;
+    t_atom out[2];
+    *argc = 2;
 	atom_setlong(out, len);
 	atom_setlong(out + 1, (long)ptr);
 #endif
-
+    
+    a = out;
 }
-
 
 void omax_util_outletOSC(void *outlet, long len, char *ptr)
 {
 	if(!omax_util_ps_FullPacket){
 		omax_util_ps_FullPacket = gensym("FullPacket");
 	}
-    t_atom out[3];
-    int numatoms;
-    omax_util_lenAndPtr2Atoms(out, &numatoms, len, ptr);
+    t_atom *out = NULL;
+    long numatoms;
+    omax_util_oscLenAndPtr2Atoms(out, &numatoms, len, ptr);
 	outlet_anything(outlet, omax_util_ps_FullPacket, numatoms, out);
 }
-
-
-
 
 int omax_util_getNumAtomsInOSCMsg(t_osc_msg_s *m)
 {
@@ -174,10 +170,7 @@ void omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 			break;
 		case 'f':
 		case 'd':
-			atom_setfloat(ptr++, osc_atom_s_getFloat(a));
-//            ptr->a_type = A_FLOAT;
-//            ptr->a_w.w_float = osc_atom_s_getFloat(a);
-//            ptr++;
+			atom_setfloat(ptr++, osc_atom_s_getFloat(a)); 
 			break;
 		case 's':		
 			{
@@ -201,21 +194,19 @@ void omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 			{
 				char *data = osc_atom_s_getData(a);
 				atom_setsym(ptr++, gensym("FullPacket"));
-#ifdef OMAX_PD_VERSION
-                uint32_t l = (uint32_t)len;
-                SETFLOAT(ptr++, *((t_float *)&l));
                 
-                uint32_t i1 = (((uint64_t)ptr) & 0xffffffff00000000) >> 32;
-                uint32_t i2 = (((uint64_t)ptr) & 0xffffffff);
-                float f1 = *((float *)&i1);
-                float f2 = *((float *)&i2);
-                
-                SETFLOAT(ptr++, f1);
-                SETFLOAT(ptr++, f1);
-#else
+                t_atom *bnddata;
+                long argc;
+                omax_util_oscLenAndPtr2Atoms(bnddata, &argc, ntoh32(*((uint32_t *)data)), data + 4);
+                int i;
+                for(i = 0; i < argc; i++)
+                {
+                    *ptr++ = bnddata[i];
+                }
+                /*
 				atom_setlong(ptr++, ntoh32(*((uint32_t *)data)));
 				atom_setlong(ptr++, (long)(data + 4));
-#endif
+                 */
 			}
 			break;
 		}
