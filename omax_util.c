@@ -48,7 +48,7 @@
 
 
 #ifdef OMAX_PD_VERSION
-
+#define NUMATOMSINMESS 3
 #define A_LONG -666
 #define A_SYM A_SYMBOL
 
@@ -58,6 +58,8 @@ extern void atom_setsym(t_atom *atom, t_symbol *s);
 extern t_int atom_getlong(t_atom *atom);
 extern t_symbol *atom_getsym(t_atom *atom);
 extern t_atomtype atom_gettype(t_atom *atom);
+#else
+#define NUMATOMSINMESS 2
 
 #endif
 
@@ -91,41 +93,36 @@ int omax_util_liboErrorHandler(const char * const errorstr)
 	return 0;
 }
 
-void omax_util_oscLenAndPtr2Atoms(long *argc, t_atom **argv, long len, char *ptr)
+void omax_util_oscLenAndPtr2Atoms(t_atom *argv, long len, char *ptr)
 {
 #ifdef OMAX_PD_VERSION
-    *argv = (t_atom *)malloc(3 * sizeof(t_atom));
-    *argc = 3;
 	uint32_t l = (uint32_t)len;
-	SETFLOAT((*argv), *((t_float *)&l));
+	atom_setfloat(argv, *((t_float *)&l));
     
     uint32_t i1 = (((uint64_t)ptr) & 0xffffffff00000000) >> 32;
     uint32_t i2 = (((uint64_t)ptr) & 0xffffffff);
     float f1 = *((float *)&i1);
     float f2 = *((float *)&i2);
-    
-    SETFLOAT((*argv)+1, f1);
-    SETFLOAT((*argv)+2, f2);
-    
+
+    atom_setfloat(argv+1, f1);
+    atom_setfloat(argv+2, f2);
+
 #else
-    *argv = (t_atom *)malloc(2 * sizeof(t_atom));
-    *argc = 2;
 	atom_setlong(out, len);
 	atom_setlong(out + 1, (long)ptr);
 #endif
     
 }
 
+
 void omax_util_outletOSC(void *outlet, long len, char *ptr)
 {
 	if(!omax_util_ps_FullPacket){
 		omax_util_ps_FullPacket = gensym("FullPacket");
 	}
-    t_atom *out = NULL;
-    long numatoms = 0;
-    omax_util_oscLenAndPtr2Atoms(&numatoms, &out, len, ptr);
-	outlet_anything(outlet, omax_util_ps_FullPacket, numatoms, out);
-    free(out);
+    t_atom out[NUMATOMSINMESS];
+    omax_util_oscLenAndPtr2Atoms(out, len, ptr);
+	outlet_anything(outlet, omax_util_ps_FullPacket, NUMATOMSINMESS, out);
 }
 
 int omax_util_getNumAtomsInOSCMsg(t_osc_msg_s *m)
@@ -136,7 +133,7 @@ int omax_util_getNumAtomsInOSCMsg(t_osc_msg_s *m)
 		t_osc_atom_s *a = osc_msg_it_s_next(it);
 		switch(osc_atom_s_getTypetag(a)){
 		case OSC_BUNDLE_TYPETAG:
-			n += 3; // FullPacket <len> <address>
+			n += (NUMATOMSINMESS+1); // FullPacket <len> <address>
 			break;
 		default:
 			n += 1;
@@ -197,15 +194,13 @@ void omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 				char *data = osc_atom_s_getData(a);
 				atom_setsym(ptr++, gensym("FullPacket"));
                 
-                t_atom *bnddata = NULL;
-                long argc;
-                omax_util_oscLenAndPtr2Atoms(&argc, &bnddata, ntoh32(*((uint32_t *)data)), data + 4);
+                t_atom bnddata[NUMATOMSINMESS];
+                omax_util_oscLenAndPtr2Atoms(bnddata, (long)ntoh32(*((uint32_t *)data)), (char *)((long)(data + 4)));
                 int i;
-                for(i = 0; i < argc; i++)
+                for(i = 0; i < NUMATOMSINMESS; i++)
                 {
                     *ptr++ = bnddata[i];
                 }
-                free(bnddata);
                 /*
 				atom_setlong(ptr++, ntoh32(*((uint32_t *)data)));
 				atom_setlong(ptr++, (long)(data + 4));
