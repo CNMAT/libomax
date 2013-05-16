@@ -1,4 +1,4 @@
-OMAX_BASENAMES = omax_util omax_class omax_doc omax_dict
+OMAX_BASENAMES = omax_util omax_class omax_doc omax_dict omax_pd_proxy
 OMAX_OBJECTS = $(foreach OBJ, $(OMAX_BASENAMES), $(OBJ).o) 
 OMAX_CFILES = $(foreach F, $(OMAX_BASENAMES), $(F).c)
 OMAX_HFILES = $(foreach F, $(OMAX_BASENAMES), $(F).h)
