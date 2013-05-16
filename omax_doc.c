@@ -25,9 +25,6 @@
 
 */
 
-#ifdef OMAX_PD_VERSION
-//no assist currently in pd
-#else
 
 #ifndef WIN_VERSION
 #include <Carbon/Carbon.h>
@@ -121,6 +118,7 @@ void _omax_doc_outletDoc(void *outlet,
 	}
 }
 
+#ifndef OMAX_PD_VERSION
 void _omax_doc_assist(long io,
 		     long num,
 		     char *buf,
@@ -144,5 +142,4 @@ void _omax_doc_assist(long io,
 		break;
 	}
 }
-
 #endif
