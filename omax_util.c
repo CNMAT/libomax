@@ -99,8 +99,8 @@ void omax_util_oscLenAndPtr2Atoms(t_atom *argv, long len, char *ptr)
 	uint32_t l = (uint32_t)len;
 	atom_setfloat(argv, *((t_float *)&l));
     
-    uint32_t i1 = (((uint64_t)ptr) & 0xffffffff00000000) >> 32;
-    uint32_t i2 = (((uint64_t)ptr) & 0xffffffff);
+	uint32_t i1 = ((((uint64_t)ptr) & 0xffffffff00000000) >> 32;
+	uint32_t i2 = (((uint64_t)ptr) & 0xffffffff);
     float f1 = *((float *)&i1);
     float f2 = *((float *)&i2);
 
