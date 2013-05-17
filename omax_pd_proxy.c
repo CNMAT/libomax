@@ -95,7 +95,7 @@ void omax_pd_proxydispatchanything(t_object *xx, t_symbol *msg, int argc, t_atom
 	post("%s disp any %s",__func__, msg->s_name);
 	t_omax_pd_proxy *x = (t_omax_pd_proxy *)xx;
 	post("%s: %p", __func__, x);
-	t_gotfn f = omax_pd_getfunctionforsymbol(xx, msg);
+	t_gotfn f = omax_pd_getfunctionforsymbol(xx, gensym("anything"));
 	post(" %s: f = %p", __func__, f);
 	if(f){
 		*(x->inletloc) = x->inletnum;
@@ -109,7 +109,7 @@ void omax_pd_proxydispatchfloat(t_object *xx, double ff)
 {
 	t_omax_pd_proxy *x = (t_omax_pd_proxy *)xx;
 	printf("%s: %p\n", __func__, x);
-	t_gotfn f = omax_pd_getfunctionforsymbol(xx, &s_float);
+	t_gotfn f = omax_pd_getfunctionforsymbol(xx, gensym("float"));
 	if(f){
 		*(x->inletloc) = x->inletnum;
 		f(x->x, ff);
@@ -120,7 +120,7 @@ void omax_pd_proxydispatchbang(t_object *xx)
 {
 	t_omax_pd_proxy *x = (t_omax_pd_proxy *)xx;
 	printf("%s: %p\n", __func__, x);
-	t_gotfn f = omax_pd_getfunctionforsymbol(xx, &s_bang);
+	t_gotfn f = omax_pd_getfunctionforsymbol(xx, gensym("bang"));
 	if(f){
 		*(x->inletloc) = x->inletnum;
 		f(x->x);
@@ -130,7 +130,7 @@ void omax_pd_proxydispatchbang(t_object *xx)
 int omax_pd_proxygetinlet(t_object *xx)
 {
 	t_omax_pd_proxy *x = (t_omax_pd_proxy *)xx;
-	printf("%s: %p\n", __func__, x);
+	post("%s: %p\n", __func__, x);
 	return *(x->inletloc);
 }
 
