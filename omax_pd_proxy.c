@@ -3,16 +3,13 @@
 #include "m_imp.h"
 #include "omax_pd_proxy.h"
 #include "osc_mem.h"
+#include <string.h>
 
 void omax_pd_proxydispatchanything(t_object *xx, t_symbol *msg, int argc, t_atom *argv);
 void omax_pd_proxydispatchfloat(t_object *xx, double ff);
 void omax_pd_proxydispatchbang(t_object *xx);
 void omax_pd_proxydispatchmethod(t_object *xx, t_symbol *msg, int argc, t_atom *argv);
-
-#define omax_pd_class_new(class, name, new, free, size, flags, ...) 	\
-		t_omax_pd_proxy_class *class = (t_omax_pd_proxy_class *)osc_mem_alloc(sizeof(t_osc_pd_proxy_class)); \
-		class->class = class_new(name, new, free, size, flags, __VA_ARGS__); \
-		class->ht = osc_hashtab_new();				
+			
 
 /*
 t_omax_pd_proxy_class *omax_pd_class_new(t_symbol *name, t_newmethod *new, t_method *free, size_t size, int flags)
@@ -26,34 +23,34 @@ t_omax_pd_proxy_class *omax_pd_class_new(t_symbol *name, t_newmethod *new, t_met
 void omax_pd_class_addmethod(t_omax_pd_proxy_class *c, t_method fp, t_symbol *msg)
 {
 	osc_hashtab_store(c->ht, strlen(msg->s_name), msg->s_name, (void *)fp);
-	class_addmethod(c, (t_method)omax_pd_proxydispatchmethod, msg, A_GIMME, 0);
+	class_addmethod(c->class, (t_method)omax_pd_proxydispatchmethod, msg, A_GIMME, 0);
 }
 
 void omax_pd_class_addfloat(t_omax_pd_proxy_class *c, t_method fp)
 {
 	char *msg = "float";
 	osc_hashtab_store(c->ht, strlen(msg), msg, (void *)fp);
-	class_addfloat(c, (t_method)omax_pd_proxydispatchfloat);
+	class_addfloat(c->class, (t_method)omax_pd_proxydispatchfloat);
 }
 
 void omax_pd_class_addbang(t_omax_pd_proxy_class *c, t_method fp)
 {
 	char *msg = "bang";
 	osc_hashtab_store(c->ht, strlen(msg), msg, (void *)fp);
-	class_addbang(c, (t_method)omax_pd_proxydispatchbang);
+	class_addbang(c->class, (t_method)omax_pd_proxydispatchbang);
 }
 
 void omax_pd_class_addanything(t_omax_pd_proxy_class *c, t_method fp)
 {
 	char *msg = "anything";
 	osc_hashtab_store(c->ht, strlen(msg), msg, (void *)fp);
-	class_addanything(c, (t_method)omax_pd_proxydispatchanything);
+	class_addanything(c->class, (t_method)omax_pd_proxydispatchanything);
 }
 
 
 t_omax_pd_proxy *omax_pd_proxynew(t_object *x, long inletnum, long *inletloc, t_omax_pd_proxy_class *class)
 {
-    	t_omax_pd_proxy *p = (t_omax_pd_proxy *)pd_new(class->class);
+    t_omax_pd_proxy *p = (t_omax_pd_proxy *)pd_new(class->class);
 	p->x = x;
 	p->class = class;
 	p->inletnum = inletnum;
@@ -64,7 +61,7 @@ t_omax_pd_proxy *omax_pd_proxynew(t_object *x, long inletnum, long *inletloc, t_
 
 t_gotfn omax_pd_getfunctionforsymbol(t_object *x, t_symbol *msg)
 {
-	t_omax_pd_proxy_class *c = ((t_omax_pd_proxy *)x)->c;
+	t_omax_pd_proxy_class *c = ((t_omax_pd_proxy *)x)->class;
 	void *f = osc_hashtab_lookup(c->ht, strlen(msg->s_name), msg->s_name);
 	/*
 	  for(int i = 0; i < ((t_pd)(x->ob_pd))->c_nmethod; i++){
