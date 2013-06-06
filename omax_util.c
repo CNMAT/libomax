@@ -217,7 +217,20 @@ void omax_util_maxFullPacketToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *len, t_
 	if(!(*osc_atom)){
 		*osc_atom = osc_atom_u_alloc();
 	}
-	osc_atom_u_setBndl(*osc_atom, atom_getlong(len), (char *)atom_getlong(ptr));
+#ifdef OMAX_PD_VERSION
+    float ff = atom_getfloat(len);
+    long l = (long)*((uint32_t *)&ff);
+    ff = atom_getfloat(ptr);
+    uint64_t l1 = *((uint64_t *)&ff);
+    l1 <<= 32;
+    ff = atom_getfloat(ptr+1);
+    uint64_t l2 = *((uint64_t *)&ff);
+    char *p = (char *)(l1 | l2);
+#else
+    long l = atom_getlong(len);
+    char *p = (char *)atom_getlong(ptr);
+#endif
+	osc_atom_u_setBndl(*osc_atom, l, p);
 }
 
 void omax_util_maxAtomToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *max_atom){
@@ -253,7 +266,11 @@ t_osc_err omax_util_maxAtomsToOSCMsg_u(t_osc_msg_u **msg, t_symbol *address, int
 				if((atom_getsym(argv + i) == gensym("FullPacket")) && argc - i >= 3){
 					// FullPacket to be encoded as nested bundle
 					omax_util_maxFullPacketToOSCAtom_u(&a, argv + 1, argv + 2);
+#ifdef OMAX_PD_VERSION
+                    i += 3;
+#else
 					i += 2;
+#endif
 				}else{
 					omax_util_maxAtomToOSCAtom_u(&a, argv + i);
 				}
