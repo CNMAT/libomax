@@ -67,7 +67,7 @@ void omax_util_maxFullPacketToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *len, t_
 void omax_util_maxAtomToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *max_atom);
 t_osc_err omax_util_maxAtomsToOSCMsg_u(t_osc_msg_u **msg, t_symbol *address, int argc, t_atom *argv);
 int omax_util_getNumAtomsInOSCMsg(t_osc_msg_s *msg);
-void omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av);
+int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av);
 
 int omax_util_liboErrorHandler(const char * const errorstr);
 
