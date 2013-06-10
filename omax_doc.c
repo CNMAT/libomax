@@ -25,6 +25,7 @@
 
 */
 
+
 #ifndef WIN_VERSION
 #include <Carbon/Carbon.h>
 #include <CoreServices/CoreServices.h>
@@ -117,6 +118,7 @@ void _omax_doc_outletDoc(void *outlet,
 	}
 }
 
+#ifndef OMAX_PD_VERSION
 void _omax_doc_assist(long io,
 		     long num,
 		     char *buf,
@@ -140,3 +142,4 @@ void _omax_doc_assist(long io,
 		break;
 	}
 }
+#endif
