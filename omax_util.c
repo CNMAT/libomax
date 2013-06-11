@@ -98,18 +98,25 @@ void omax_util_oscLenAndPtr2Atoms(t_atom *argv, long len, char *ptr)
 #ifdef OMAX_PD_VERSION
 	uint32_t l = (uint32_t)len;
 	atom_setfloat(argv, *((t_float *)&l));
-    
-	uint32_t i1 = (((uint64_t)ptr) & 0xffffffff00000000) >> 32;
-	uint32_t i2 = (((uint64_t)ptr) & 0xffffffff);
-    float f1 = *((float *)&i1);
-    float f2 = *((float *)&i2);
 
-    atom_setfloat(argv+1, f1);
-    atom_setfloat(argv+2, f2);
+#if UINTPTR_MAX == 0xffffffff
+	uint32_t i2 = (uint32_t)ptr;
+	float f1 = 0;
+	float f2 = *((float *)&i2);
+#elif UINTPTR_MAX == 0xffffffffffffffff
+	uint32_t i1 = (uint32_t)((((uint64_t)ptr) & 0xffffffff00000000) >> 32);
+	uint32_t i2 = (uint32_t)((((uint64_t)ptr) & 0xffffffff));
+	float f1 = *((float *)&i1);
+	float f2 = *((float *)&i2);
+#else
+#error This is BAD BAD BAD
+#endif    
+	atom_setfloat(argv+1, f1);
+	atom_setfloat(argv+2, f2);
 
 #else
-	atom_setlong(out, len);
-	atom_setlong(out + 1, (long)ptr);
+	atom_setlong(argv, len);
+	atom_setlong(argv + 1, (long)ptr);
 #endif
     
 }
@@ -120,8 +127,8 @@ void omax_util_outletOSC(void *outlet, long len, char *ptr)
 	if(!omax_util_ps_FullPacket){
 		omax_util_ps_FullPacket = gensym("FullPacket");
 	}
-    t_atom out[NUMATOMSINMESS];
-    omax_util_oscLenAndPtr2Atoms(out, len, ptr);
+	t_atom out[NUMATOMSINMESS];
+	omax_util_oscLenAndPtr2Atoms(out, len, ptr);
 	outlet_anything(outlet, omax_util_ps_FullPacket, NUMATOMSINMESS, out);
 }
 
@@ -194,17 +201,17 @@ void omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 				char *data = osc_atom_s_getData(a);
 				atom_setsym(ptr++, gensym("FullPacket"));
                 
-                t_atom bnddata[NUMATOMSINMESS];
-                omax_util_oscLenAndPtr2Atoms(bnddata, (long)ntoh32(*((uint32_t *)data)), (char *)((long)(data + 4)));
-                int i;
-                for(i = 0; i < NUMATOMSINMESS; i++)
-                {
-                    *ptr++ = bnddata[i];
-                }
-                /*
-				atom_setlong(ptr++, ntoh32(*((uint32_t *)data)));
-				atom_setlong(ptr++, (long)(data + 4));
-                 */
+				t_atom bnddata[NUMATOMSINMESS];
+				omax_util_oscLenAndPtr2Atoms(bnddata, (long)ntoh32(*((uint32_t *)data)), (char *)((long)(data + 4)));
+				int i;
+				for(i = 0; i < NUMATOMSINMESS; i++)
+					{
+						*ptr++ = bnddata[i];
+					}
+				/*
+				  atom_setlong(ptr++, ntoh32(*((uint32_t *)data)));
+				  atom_setlong(ptr++, (long)(data + 4));
+				*/
 			}
 			break;
 		}
