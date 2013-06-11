@@ -1,7 +1,6 @@
 #ifdef OMAX_PD_VERSION
 #include "osc_hashtab.h"
 #define proxy_new omax_pd_proxynew
-#define proxy_getinlet omax_pd_proxygetinlet
 
 typedef struct _omax_pd_proxy_class{
 	void *class;

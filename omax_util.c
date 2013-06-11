@@ -151,7 +151,18 @@ int omax_util_getNumAtomsInOSCMsg(t_osc_msg_s *m)
 	return n;
 }
 
-void omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
+int omax_util_braceError(char *s)
+{
+    int i, len = strlen(s);
+    for( i = 0; i < len; i++ )
+    {
+        if(s[i] == '{' || s[i] == '}')
+            return 1;
+    }
+    return 0;
+}
+
+int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 {
 	t_atom *ptr = av;
 	if(osc_message_s_getAddress(m)){
@@ -184,6 +195,10 @@ void omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 				char buf[len + 1];
 				char *bufptr = buf;
 				osc_atom_s_getString(a, len + 1, &bufptr);
+#ifdef OMAX_PD_VERSION
+                if(omax_util_braceError(bufptr))
+                    return 1;
+#endif
 				atom_setsym(ptr++, gensym(buf));
 			}
 			break;
@@ -217,6 +232,7 @@ void omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 		}
 	}
 	osc_msg_it_s_destroy(it);
+    return 0;
 }
 
 // encode a FullPacket <len> <ptr> message as a nested bundle
@@ -224,7 +240,20 @@ void omax_util_maxFullPacketToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *len, t_
 	if(!(*osc_atom)){
 		*osc_atom = osc_atom_u_alloc();
 	}
-	osc_atom_u_setBndl(*osc_atom, atom_getlong(len), (char *)atom_getlong(ptr));
+#ifdef OMAX_PD_VERSION
+    float ff = atom_getfloat(len);
+    long l = (long)*((uint32_t *)&ff);
+    ff = atom_getfloat(ptr);
+    uint64_t l1 = *((uint64_t *)&ff);
+    l1 <<= 32;
+    ff = atom_getfloat(ptr+1);
+    uint64_t l2 = *((uint64_t *)&ff);
+    char *p = (char *)(l1 | l2);
+#else
+    long l = atom_getlong(len);
+    char *p = (char *)atom_getlong(ptr);
+#endif
+	osc_atom_u_setBndl(*osc_atom, l, p);
 }
 
 void omax_util_maxAtomToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *max_atom){
@@ -260,7 +289,11 @@ t_osc_err omax_util_maxAtomsToOSCMsg_u(t_osc_msg_u **msg, t_symbol *address, int
 				if((atom_getsym(argv + i) == gensym("FullPacket")) && argc - i >= 3){
 					// FullPacket to be encoded as nested bundle
 					omax_util_maxFullPacketToOSCAtom_u(&a, argv + 1, argv + 2);
+#ifdef OMAX_PD_VERSION
+                    i += 3;
+#else
 					i += 2;
+#endif
 				}else{
 					omax_util_maxAtomToOSCAtom_u(&a, argv + i);
 				}
