@@ -66,7 +66,6 @@ extern t_atomtype atom_gettype(t_atom *atom);
 
 t_symbol *omax_util_ps_FullPacket = NULL;
 
-
 //#define __ODOT_PROFILE__
 //#include "osc_profile.h"
 
@@ -305,3 +304,4 @@ t_osc_err omax_util_maxAtomsToOSCMsg_u(t_osc_msg_u **msg, t_symbol *address, int
 	}
 	return OSC_ERR_NONE;
 }
+
