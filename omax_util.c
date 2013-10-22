@@ -38,7 +38,9 @@
 #include "osc_byteorder.h"
 #include "osc_match.h"
 #include "osc_bundle_s.h"
+#include "osc_bundle_u.h"
 #include "osc_bundle_iterator_s.h"
+#include "osc_bundle_iterator_u.h"
 #include "osc_message_u.h"
 #include "osc_message_iterator_u.h"
 #include "osc_message_s.h"
@@ -305,3 +307,53 @@ t_osc_err omax_util_maxAtomsToOSCMsg_u(t_osc_msg_u **msg, t_symbol *address, int
 	return OSC_ERR_NONE;
 }
 
+t_osc_err omax_util_copyBundleWithSubs_u(t_osc_bndl_u **dest, t_osc_bndl_u *src, int argc, t_atom *argv, int *hassubs)
+{
+	if(!src){
+		return -1;
+	}
+	*hassubs = 0;
+	t_osc_bndl_u *copy = osc_bundle_u_alloc();
+	t_osc_bndl_it_u *bit = osc_bndl_it_u_get(src);
+	while(osc_bndl_it_u_hasNext(bit)){
+		t_osc_msg_u *m = osc_bndl_it_u_next(bit);
+		t_osc_msg_u *mcopy = osc_message_u_alloc();
+		osc_message_u_setAddress(mcopy, osc_message_u_getAddress(m));
+		t_osc_msg_it_u *mit = osc_msg_it_u_get(m);
+		while(osc_msg_it_u_hasNext(mit)){
+			t_osc_atom_u *a = osc_msg_it_u_next(mit);
+			t_osc_atom_u *acopy = NULL;
+			if(osc_atom_u_getTypetag(a) == 's'){
+				char *s = osc_atom_u_getStringPtr(a);
+				if(s && s[0] == '$' && strlen(s) > 1){
+					long l = strtol(s + 1, NULL, 0);
+					if(l > 0){
+						*hassubs = 1;
+						if(l < argc + 1){
+							omax_util_maxAtomToOSCAtom_u(&acopy, argv + (l - 1));
+						}else{
+							osc_atom_u_copy(&acopy, a);
+						}
+					}else{
+						osc_atom_u_copy(&acopy, a);
+					}
+				}else{
+					osc_atom_u_copy(&acopy, a);
+				}
+			}else if(osc_atom_u_getTypetag(a) == OSC_BUNDLE_TYPETAG){
+				t_osc_bndl_u *ncopy = NULL;
+				omax_util_copyBundleWithSubs_u(&ncopy, osc_atom_u_getBndl(a), argc, argv, hassubs);
+				acopy = osc_atom_u_alloc();
+				osc_atom_u_setBndl_u(acopy, ncopy);
+			}else{
+				osc_atom_u_copy(&acopy, a);
+			}
+			osc_message_u_appendAtom(mcopy, acopy);
+		}
+		osc_msg_it_u_destroy(mit);
+		osc_bundle_u_addMsg(copy, mcopy);
+	}
+	osc_bndl_it_u_destroy(bit);
+	*dest = copy;
+	return OSC_ERR_NONE;
+}

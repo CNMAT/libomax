@@ -70,6 +70,8 @@ int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av);
 
 int omax_util_liboErrorHandler(const char * const errorstr);
 
+t_osc_err omax_util_copyBundleWithSubs_u(t_osc_bndl_u **dest, t_osc_bndl_u *src, int argc, t_atom *argv, int *hassubs);
+
 #ifdef __cplusplus
 }
 #endif
