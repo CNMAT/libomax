@@ -271,6 +271,8 @@ void omax_util_maxAtomToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *max_atom){
 	case A_SYM:
 		osc_atom_u_setString(*osc_atom, atom_getsym(max_atom)->s_name);
 		break;
+	default:
+		break;
 	}
 }
 
@@ -291,7 +293,7 @@ t_osc_err omax_util_maxAtomsToOSCMsg_u(t_osc_msg_u **msg, t_symbol *address, int
 					// FullPacket to be encoded as nested bundle
 					omax_util_maxFullPacketToOSCAtom_u(&a, argv + 1, argv + 2);
 #ifdef OMAX_PD_VERSION
-                    i += 3;
+					i += 3;
 #else
 					i += 2;
 #endif
@@ -313,12 +315,86 @@ t_osc_err omax_util_copyBundleWithSubs_u(t_osc_bndl_u **dest, t_osc_bndl_u *src,
 		return -1;
 	}
 	*hassubs = 0;
-	t_osc_bndl_u *copy = osc_bundle_u_alloc();
+	t_osc_bndl_u *bcopy = osc_bundle_u_alloc();
 	t_osc_bndl_it_u *bit = osc_bndl_it_u_get(src);
+
 	while(osc_bndl_it_u_hasNext(bit)){
 		t_osc_msg_u *m = osc_bndl_it_u_next(bit);
 		t_osc_msg_u *mcopy = osc_message_u_alloc();
-		osc_message_u_setAddress(mcopy, osc_message_u_getAddress(m));
+		{
+			char *address = osc_message_u_getAddress(m);
+			int addresslen = strlen(address) + 1;
+			char copy[addresslen];
+			char *copyptr = copy;
+			memcpy(copy, address, addresslen);
+			int newaddresslen = addresslen;
+			int dosub = 0;
+			int addedtolist = 0;
+			char *tok = NULL;
+			while((tok = strsep(&copyptr, "$"))){
+				if(copyptr){
+					dosub = 1;
+					char *endp = NULL;
+					long l = strtol(copyptr, &endp, 0) - 1;
+					if(l < argc){
+						switch(atom_gettype(argv + l)){
+						case A_LONG:
+							newaddresslen += snprintf(NULL, 0, "%lld", (long long)atom_getlong(argv + l));
+							break;
+						case A_FLOAT:
+							newaddresslen += snprintf(NULL, 0, "%f", atom_getfloat(argv + l));
+							break;
+						case A_SYM:
+							newaddresslen += strlen(atom_getsym(argv + l)->s_name);
+							break;
+						default:
+							break;
+						}
+					}else{
+					        newaddresslen += snprintf(NULL, 0, "$%ld", l + 1);
+					}
+				}
+			}
+			if(dosub){
+				*hassubs = 1;
+				//newaddresslen += 16; // never can be too careful...
+				char *newaddress = osc_mem_alloc(newaddresslen);
+				char *ptr = newaddress;
+				memcpy(copy, address, addresslen);
+				copyptr = copy;
+				char *lasttok = copy, *tok = NULL;
+				while((tok = strsep(&copyptr, "$"))){
+					ptr += sprintf(ptr, "%s", lasttok);
+					if(copyptr){
+						dosub = 1;
+						char *endp = NULL;
+						long l = strtol(copyptr, &endp, 0) - 1;
+						if(l < argc){
+							switch(atom_gettype(argv + l)){
+							case A_LONG:
+								ptr += sprintf(ptr, "%lld", (long long)atom_getlong(argv + l));
+								break;
+							case A_FLOAT:
+								ptr += sprintf(ptr, "%f", atom_getfloat(argv + l));
+								break;
+							case A_SYM:
+								ptr += sprintf(ptr, "%s", atom_getsym(argv + l)->s_name);
+								break;
+							default:
+								break;
+							}
+						}else{
+							ptr += sprintf(ptr, "$%ld", l + 1);
+						}
+						lasttok = endp;
+					}
+				}
+				osc_message_u_setAddressPtr(mcopy, newaddress, NULL);
+			}else{
+				osc_message_u_setAddress(mcopy, osc_message_u_getAddress(m));
+			}
+		}
+
 		t_osc_msg_it_u *mit = osc_msg_it_u_get(m);
 		while(osc_msg_it_u_hasNext(mit)){
 			t_osc_atom_u *a = osc_msg_it_u_next(mit);
@@ -351,9 +427,9 @@ t_osc_err omax_util_copyBundleWithSubs_u(t_osc_bndl_u **dest, t_osc_bndl_u *src,
 			osc_message_u_appendAtom(mcopy, acopy);
 		}
 		osc_msg_it_u_destroy(mit);
-		osc_bundle_u_addMsg(copy, mcopy);
+		osc_bundle_u_addMsg(bcopy, mcopy);
 	}
 	osc_bndl_it_u_destroy(bit);
-	*dest = copy;
+	*dest = bcopy;
 	return OSC_ERR_NONE;
 }
