@@ -62,6 +62,7 @@ extern "C" {
 #endif
 
 void omax_util_outletOSC(void *outlet, long len, char *ptr);
+t_osc_err omax_util_outletOSC_u(void *outlet, t_osc_bndl_u *bndl);
 void omax_util_maxFullPacketToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *len, t_atom *ptr);
 void omax_util_maxAtomToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *max_atom);
 t_osc_err omax_util_maxAtomsToOSCMsg_u(t_osc_msg_u **msg, t_symbol *address, int argc, t_atom *argv);

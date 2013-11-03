@@ -133,6 +133,24 @@ void omax_util_outletOSC(void *outlet, long len, char *ptr)
 	outlet_anything(outlet, omax_util_ps_FullPacket, NUMATOMSINMESS, out);
 }
 
+t_osc_err omax_util_outletOSC_u(void *outlet, t_osc_bndl_u *bndl)
+{
+	if(!omax_util_ps_FullPacket){
+		omax_util_ps_FullPacket = gensym("FullPacket");
+	}
+	long len = 0;
+	char *ptr = NULL;
+	t_osc_err e = osc_bundle_u_serialize(bndl, &len, &ptr);
+	if(e){
+		return e;
+	}
+	if(len && ptr){
+		omax_util_outletOSC(outlet, len, ptr);
+		osc_mem_free(ptr);
+	}
+	return OSC_ERR_NONE;
+}
+
 int omax_util_getNumAtomsInOSCMsg(t_osc_msg_s *m)
 {
 	int n = 1; // address;
@@ -142,6 +160,12 @@ int omax_util_getNumAtomsInOSCMsg(t_osc_msg_s *m)
 		switch(osc_atom_s_getTypetag(a)){
 		case OSC_BUNDLE_TYPETAG:
 			n += (NUMATOMSINMESS+1); // FullPacket <len> <address>
+			break;
+		case 'b':
+			{
+				char *data = osc_atom_s_getData(a);
+				n += ntoh32(*((int32_t *)data));	
+			}
 			break;
 		default:
 			n += 1;
@@ -206,12 +230,13 @@ int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 		case 'b':
 			{
 				int j, n = osc_atom_s_sizeof(a);
-				char *data = osc_message_s_getData(m);
-				atom_setlong(ptr++, ntoh32(*((uint32_t *)(data))));
-				for(j = 0; j < n; j++){
-					atom_setlong(ptr++, (long)data[j]);
+				char *data = osc_atom_s_getBlob(a);
+				//atom_setlong(ptr++, ntoh32(*((int32_t *)(data))));
+				for(j = 0; j < n - 4; j++){
+					atom_setlong(ptr++, (long)data[j + 4]);
 				}
 			}
+			break;
 		case OSC_BUNDLE_TYPETAG:
 			{
 				char *data = osc_atom_s_getData(a);
@@ -333,25 +358,29 @@ t_osc_err omax_util_copyBundleWithSubs_u(t_osc_bndl_u **dest, t_osc_bndl_u *src,
 			char *tok = NULL;
 			while((tok = strsep(&copyptr, "$"))){
 				if(copyptr){
-					dosub = 1;
-					char *endp = NULL;
-					long l = strtol(copyptr, &endp, 0) - 1;
-					if(l < argc){
-						switch(atom_gettype(argv + l)){
-						case A_LONG:
-							newaddresslen += snprintf(NULL, 0, "%lld", (long long)atom_getlong(argv + l));
-							break;
-						case A_FLOAT:
-							newaddresslen += snprintf(NULL, 0, "%f", atom_getfloat(argv + l));
-							break;
-						case A_SYM:
-							newaddresslen += strlen(atom_getsym(argv + l)->s_name);
-							break;
-						default:
-							break;
+					if(copyptr[0] < 58 && copyptr[0] > 47){
+						dosub = 1;
+						char *endp = NULL;
+						long l = strtol(copyptr, &endp, 0) - 1;
+						if(l < argc){
+							switch(atom_gettype(argv + l)){
+							case A_LONG:
+								newaddresslen += snprintf(NULL, 0, "%lld", (long long)atom_getlong(argv + l));
+								break;
+							case A_FLOAT:
+								newaddresslen += snprintf(NULL, 0, "%f", atom_getfloat(argv + l));
+								break;
+							case A_SYM:
+								newaddresslen += strlen(atom_getsym(argv + l)->s_name);
+								break;
+							default:
+								break;
+							}
+						}else{
+							newaddresslen += snprintf(NULL, 0, "$%ld", l + 1);
 						}
 					}else{
-					        newaddresslen += snprintf(NULL, 0, "$%ld", l + 1);
+						newaddresslen++;
 					}
 				}
 			}
@@ -366,27 +395,31 @@ t_osc_err omax_util_copyBundleWithSubs_u(t_osc_bndl_u **dest, t_osc_bndl_u *src,
 				while((tok = strsep(&copyptr, "$"))){
 					ptr += sprintf(ptr, "%s", lasttok);
 					if(copyptr){
-						dosub = 1;
-						char *endp = NULL;
-						long l = strtol(copyptr, &endp, 0) - 1;
-						if(l < argc){
-							switch(atom_gettype(argv + l)){
-							case A_LONG:
-								ptr += sprintf(ptr, "%lld", (long long)atom_getlong(argv + l));
-								break;
-							case A_FLOAT:
-								ptr += sprintf(ptr, "%f", atom_getfloat(argv + l));
-								break;
-							case A_SYM:
-								ptr += sprintf(ptr, "%s", atom_getsym(argv + l)->s_name);
-								break;
-							default:
-								break;
+						if(copyptr[0] < 58 && copyptr[0] > 47){
+							char *endp = NULL;
+							long l = strtol(copyptr, &endp, 0) - 1;
+							if(l < argc){
+								switch(atom_gettype(argv + l)){
+								case A_LONG:
+									ptr += sprintf(ptr, "%lld", (long long)atom_getlong(argv + l));
+									break;
+								case A_FLOAT:
+									ptr += sprintf(ptr, "%f", atom_getfloat(argv + l));
+									break;
+								case A_SYM:
+									ptr += sprintf(ptr, "%s", atom_getsym(argv + l)->s_name);
+									break;
+								default:
+									break;
+								}
+							}else{
+								ptr += sprintf(ptr, "$%ld", l + 1);
 							}
+							lasttok = endp;
 						}else{
-							ptr += sprintf(ptr, "$%ld", l + 1);
+							*ptr++ = '$';
+							*ptr = '\0';
 						}
-						lasttok = endp;
 					}
 				}
 				osc_message_u_setAddressPtr(mcopy, newaddress, NULL);
