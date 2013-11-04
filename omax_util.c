@@ -228,14 +228,15 @@ int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 			}
 			break;
 		case 'b':
+			/*
 			{
 				int j, n = osc_atom_s_sizeof(a);
 				char *data = osc_atom_s_getBlob(a);
-				//atom_setlong(ptr++, ntoh32(*((int32_t *)(data))));
 				for(j = 0; j < n - 4; j++){
 					atom_setlong(ptr++, (long)data[j + 4]);
 				}
 			}
+			 */
 			break;
 		case OSC_BUNDLE_TYPETAG:
 			{
