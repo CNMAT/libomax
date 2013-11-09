@@ -263,7 +263,8 @@ int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 }
 
 // encode a FullPacket <len> <ptr> message as a nested bundle
-void omax_util_maxFullPacketToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *len, t_atom *ptr){
+void omax_util_maxFullPacketToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *len, t_atom *ptr)
+{
 	if(!(*osc_atom)){
 		*osc_atom = osc_atom_u_alloc();
 	}
@@ -283,7 +284,8 @@ void omax_util_maxFullPacketToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *len, t_
 	osc_atom_u_setBndl(*osc_atom, l, p);
 }
 
-void omax_util_maxAtomToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *max_atom){
+void omax_util_maxAtomToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *max_atom)
+{
 	if(!(*osc_atom)){
 		*osc_atom = osc_atom_u_alloc();
 	}
@@ -295,14 +297,23 @@ void omax_util_maxAtomToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *max_atom){
 		osc_atom_u_setInt32(*osc_atom, atom_getlong(max_atom));
 		break;
 	case A_SYM:
-		osc_atom_u_setString(*osc_atom, atom_getsym(max_atom)->s_name);
-		break;
+		{
+			t_symbol *s = atom_getsym(max_atom);
+			if(s && s->s_name){
+				osc_atom_u_setString(*osc_atom, s->s_name);
+				break;
+			}
+			// intentional fall-through to default
+		}
 	default:
+		osc_atom_u_free(*osc_atom);
+		*osc_atom = NULL;
 		break;
 	}
 }
 
-t_osc_err omax_util_maxAtomsToOSCMsg_u(t_osc_msg_u **msg, t_symbol *address, int argc, t_atom *argv){
+t_osc_err omax_util_maxAtomsToOSCMsg_u(t_osc_msg_u **msg, t_symbol *address, int argc, t_atom *argv)
+{
 	if(!(*msg)){
 		*msg = osc_message_u_alloc();
 		if(address){
@@ -329,7 +340,9 @@ t_osc_err omax_util_maxAtomsToOSCMsg_u(t_osc_msg_u **msg, t_symbol *address, int
 			}else{
 				omax_util_maxAtomToOSCAtom_u(&a, argv + i);
 			}
-			osc_message_u_appendAtom(*msg, a);
+			if(a){
+				osc_message_u_appendAtom(*msg, a);
+			}
 		}
 	}
 	return OSC_ERR_NONE;
