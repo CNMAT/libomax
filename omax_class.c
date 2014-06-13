@@ -39,8 +39,6 @@
 #include "osc.h"
 #include "osc_mem.h"
 #include "osc_byteorder.h"
-#include "osc_bundle.h"
-#include "osc_message.h"
 #include "osc_match.h"
 #include "osc_message_u.h"
 #include "osc_message_iterator_u.h"
