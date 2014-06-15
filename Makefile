@@ -3,7 +3,7 @@ OMAX_OBJECTS = $(foreach OBJ, $(OMAX_BASENAMES), $(OBJ).o)
 OMAX_CFILES = $(foreach F, $(OMAX_BASENAMES), $(F).c)
 OMAX_HFILES = $(foreach F, $(OMAX_BASENAMES), $(F).h)
 
-OPD_BASENAMES = omax_util omax_doc omax_pd_proxy omax_gconfig
+OPD_BASENAMES = omax_util omax_doc omax_pd_proxy 
 OPD_OBJECTS = $(foreach OBJ, $(OPD_BASENAMES), $(OBJ)_libopd.o) 
 OPD_CFILES = $(foreach F, $(OPD_BASENAMES), $(F).c)
 OPD_HFILES = $(foreach F, $(OPD_BASENAMES), $(F).h)
@@ -14,7 +14,7 @@ MSP_INCLUDES = $(C74SUPPORT)/msp-includes
 PD_INCLUDES = ../pd-src/src
 
 MAC_SYSROOT = MacOSX10.8.sdk 
-MAC-CFLAGS = -arch i386 -arch x86_64 -O3 -funroll-loops -isysroot /Developer/SDKs/$(MAC_SYSROOT) -mmacosx-version-min=10.5 -std=c99 
+MAC-CFLAGS = -arch i386 -arch x86_64 -O3 -funroll-loops -isysroot /Users/r/Documents/dev-lib/SDKs/$(MAC_SYSROOT) -mmacosx-version-min=10.5 -std=c99 
 MAC-PD-CFLAGS = $(MAC-CFLAGS) -DOMAX_PD_VERSION
 WIN-CFLAGS = -O3 -funroll-loops -mno-cygwin -DWIN_VERSION -DWIN_EXT_VERSION -U__STRICT_ANSI__ -U__ANSI_SOURCE -std=c99
 

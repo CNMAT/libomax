@@ -9,12 +9,20 @@ void omax_pd_proxydispatchanything(t_object *xx, t_symbol *msg, int argc, t_atom
 void omax_pd_proxydispatchfloat(t_object *xx, t_float ff);
 void omax_pd_proxydispatchbang(t_object *xx);
 void omax_pd_proxydispatchmethod(t_object *xx, t_symbol *msg, int argc, t_atom *argv);
-			
+void omax_pd_proxydispatchsymbol(t_object *xx, t_symbol *msg);
+
 
 void omax_pd_class_addmethod(t_omax_pd_proxy_class *c, t_method fp, t_symbol *msg)
 {
 	osc_hashtab_store(c->ht, strlen(msg->s_name), msg->s_name, (void *)fp);
 	class_addmethod(c->class, (t_method)omax_pd_proxydispatchmethod, msg, A_GIMME, 0);
+}
+
+void omax_pd_class_addsymbol(t_omax_pd_proxy_class *c, t_method fp)
+{
+	char *msg = "symbol";
+	osc_hashtab_store(c->ht, strlen(msg), msg, (void *)fp);
+	class_addsymbol(c->class, (t_method)omax_pd_proxydispatchsymbol);
 }
 
 void omax_pd_class_addfloat(t_omax_pd_proxy_class *c, t_method fp)
@@ -89,6 +97,17 @@ void omax_pd_proxydispatchfloat(t_object *xx, t_float ff)
 		f(x->x, (double)ff);
 	}
 }
+
+void omax_pd_proxydispatchsymbol(t_object *xx, t_symbol *msg)
+{
+	t_omax_pd_proxy *x = (t_omax_pd_proxy *)xx;
+	t_gotfn f = omax_pd_getfunctionforsymbol(xx, gensym("symbol"));
+	if(f){
+		*(x->inletloc) = x->inletnum;
+		f(x->x, msg);
+	}
+}
+
 
 void omax_pd_proxydispatchbang(t_object *xx)
 {
