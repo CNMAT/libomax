@@ -291,7 +291,7 @@ void omax_util_maxAtomToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *max_atom)
 	}
 	switch(atom_gettype(max_atom)){
 	case A_FLOAT:
-		osc_atom_u_setFloat(*osc_atom, atom_getfloat(max_atom));
+		osc_atom_u_setDouble(*osc_atom, atom_getfloat(max_atom));
 		break;
 	case A_LONG:
 		osc_atom_u_setInt32(*osc_atom, atom_getlong(max_atom));
