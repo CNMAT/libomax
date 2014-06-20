@@ -298,11 +298,19 @@ void omax_util_maxAtomToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *max_atom)
 		break;
 	case A_SYM:
 		{
+#ifdef OMAX_PD_VERSION
+			t_symbol *sym = atom_getsym(max_atom);
+			char buf[ strlen(sym->s_name) + 1 ];
+			strcpy(buf, sym->s_name);
+			omax_util_hashBrackets2Curlies(buf);
+			osc_atom_u_setString(*osc_atom, buf);
+#else
 			t_symbol *s = atom_getsym(max_atom);
 			if(s && s->s_name){
 				osc_atom_u_setString(*osc_atom, s->s_name);
 				break;
 			}
+#endif
 			// intentional fall-through to default
 		}
 	default:
