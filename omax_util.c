@@ -50,6 +50,8 @@
 
 
 #ifdef OMAX_PD_VERSION
+#define OMAX_PD_MAXSTRINGSIZE (1<<16)
+
 #define NUMATOMSINMESS 3
 #define A_LONG -666
 #define A_SYM A_SYMBOL
@@ -187,6 +189,75 @@ int omax_util_braceError(char *s)
     return 0;
 }
 
+void omax_util_hashBrackets2Curlies(char *s)
+{
+    
+	char c;
+	int len = strlen(s);
+    
+	int i, j = 0;
+	for( i = 0; i < len; i++ )
+    {
+        c = s[i];
+        if( i < len-1 )
+        {
+            if(s[i] == '#' && s[i+1] == '['){
+                c = '{';
+                i++;
+            } else if(s[i] == ']' && s[i+1] == '#') {
+                c = '}';
+                i++;
+            }
+        }
+        s[j++] = c;
+    }
+    
+	while(j < len)
+		s[j++] = '\0';
+    
+}
+
+void omax_util_curlies2hashBrackets(char **ptr, long bufsize)
+{
+	//   printf("%s", __func__);
+    
+	char *str = (*ptr);
+	if(!str)
+    {
+        error("no string in buffer");
+        return;
+    }
+    
+	int i, j = 0;
+	int len = strlen(str);
+	char buf[len * 2]; //<< max possible size with every character being a { or }
+	memset(buf, '\0', len * 2);
+    
+	for( i = 0; i < len; i++ )
+    {
+        if (str[i] == '{')
+        {
+            buf[j++] = '#';
+            buf[j++] = '[';
+        }
+        else if (str[i] == '}')
+        {
+            buf[j++] = ']';
+            buf[j++] = '#';
+        } else {
+            buf[j++] = str[i];
+        }
+    }
+	if(j != i)
+    {
+        memset(*ptr, '\0', bufsize);
+        //        *ptr = (char *)realloc(*ptr, sizeof(char) * j);
+        strcpy(*ptr, buf);
+    }
+}
+
+
+
 int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 {
 	t_atom *ptr = av;
@@ -221,10 +292,18 @@ int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 				char *bufptr = buf;
 				osc_atom_s_getString(a, len + 1, &bufptr);
 #ifdef OMAX_PD_VERSION
-                if(omax_util_braceError(bufptr))
+                char extrabuf[OMAX_PD_MAXSTRINGSIZE];
+                strcpy(extrabuf, bufptr);
+                char *pdbufptr = extrabuf;
+                omax_util_curlies2hashBrackets(&pdbufptr, OMAX_PD_MAXSTRINGSIZE);
+                
+                if(omax_util_braceError(pdbufptr))
                     return 1;
-#endif
+                
+                atom_setsym(ptr++, gensym(extrabuf));
+#else
 				atom_setsym(ptr++, gensym(buf));
+#endif
 			}
 			break;
 		case 'b':

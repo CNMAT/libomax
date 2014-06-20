@@ -62,7 +62,9 @@ extern "C" {
 #endif
 
 void omax_util_oscLenAndPtr2Atoms(t_atom *argv, long len, char *ptr);
-    
+void omax_util_curlies2hashBrackets(char **ptr, long bufsize);
+void omax_util_hashBrackets2Curlies(char *s);
+
 void omax_util_outletOSC(void *outlet, long len, char *ptr);
 t_osc_err omax_util_outletOSC_u(void *outlet, t_osc_bndl_u *bndl);
 void omax_util_maxFullPacketToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *len, t_atom *ptr);
