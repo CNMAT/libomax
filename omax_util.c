@@ -50,7 +50,6 @@
 
 
 #ifdef OMAX_PD_VERSION
-#define OMAX_PD_MAXSTRINGSIZE (1<<16)
 
 #define NUMATOMSINMESS 3
 #define A_LONG -666
@@ -292,10 +291,10 @@ int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 				char *bufptr = buf;
 				osc_atom_s_getString(a, len + 1, &bufptr);
 #ifdef OMAX_PD_VERSION
-                char extrabuf[OMAX_PD_MAXSTRINGSIZE];
+                char extrabuf[(len + 1) * 2];
                 strcpy(extrabuf, bufptr);
                 char *pdbufptr = extrabuf;
-                omax_util_curlies2hashBrackets(&pdbufptr, OMAX_PD_MAXSTRINGSIZE);
+                omax_util_curlies2hashBrackets(&pdbufptr, (len + 1) * 2);
                 
                 if(omax_util_braceError(pdbufptr))
                     return 1;
