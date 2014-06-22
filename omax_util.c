@@ -291,10 +291,11 @@ int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 				char *bufptr = buf;
 				osc_atom_s_getString(a, len + 1, &bufptr);
 #ifdef OMAX_PD_VERSION
-                char extrabuf[(len + 1) * 2];
+                int maxsize = (len * 2) + 1; // maximum possible size if all characters are {} + \0
+                char extrabuf[maxsize];
                 strcpy(extrabuf, bufptr);
                 char *pdbufptr = extrabuf;
-                omax_util_curlies2hashBrackets(&pdbufptr, (len + 1) * 2);
+                omax_util_curlies2hashBrackets(&pdbufptr, maxsize);
                 
                 if(omax_util_braceError(pdbufptr))
                     return 1;
@@ -378,10 +379,14 @@ void omax_util_maxAtomToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *max_atom)
 		{
 #ifdef OMAX_PD_VERSION
 			t_symbol *sym = atom_getsym(max_atom);
-			char buf[ strlen(sym->s_name) + 1 ];
-			strcpy(buf, sym->s_name);
-			omax_util_hashBrackets2Curlies(buf);
-			osc_atom_u_setString(*osc_atom, buf);
+            if(sym && sym->s_name)
+            {
+                char buf[ strlen(sym->s_name) + 1 ];
+                strcpy(buf, sym->s_name);
+                omax_util_hashBrackets2Curlies(buf);
+                osc_atom_u_setString(*osc_atom, buf);
+                break;
+            }
 #else
 			t_symbol *s = atom_getsym(max_atom);
 			if(s && s->s_name){
