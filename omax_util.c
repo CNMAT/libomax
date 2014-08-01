@@ -558,7 +558,7 @@ t_osc_err omax_util_copyBundleWithSubs_u(t_osc_bndl_u **dest, t_osc_bndl_u *src,
 				t_osc_bndl_u *ncopy = NULL;
 				omax_util_copyBundleWithSubs_u(&ncopy, osc_atom_u_getBndl(a), argc, argv, hassubs);
 				acopy = osc_atom_u_alloc();
-				osc_atom_u_setBndl_u(acopy, ncopy);
+				osc_atom_u_setBndl_u(acopy, ncopy, 1);
 			}else{
 				osc_atom_u_copy(&acopy, a);
 			}

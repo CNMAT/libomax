@@ -186,7 +186,7 @@ void omax_realtime_clock_tick(void *trigger)
     
 	//loop_err = cmmjl_osc_timetag_distance_to_float(&now, &(x->t1));
 	//if(now > x->t1){
-        if(osc_timetag_compare(now, x->t1) == 1){
+	if(osc_timetag_compare(now, x->t1) == 1){
 		loop_err = osc_timetag_timetagToFloat(osc_timetag_subtract(now, x->t1));
 	}else{
 		loop_err = osc_timetag_timetagToFloat(osc_timetag_subtract(x->t1, now)) * -1.;
