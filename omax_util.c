@@ -165,7 +165,7 @@ int omax_util_getNumAtomsInOSCMsg(t_osc_msg_s *m)
 		case 'b':
 			{
 				char *data = osc_atom_s_getData(a);
-				n += ntoh32(*((int32_t *)data));	
+				n += ntoh32(*((int32_t *)data)) + 1;
 			}
 			break;
 		default:
@@ -307,15 +307,14 @@ int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 			}
 			break;
 		case 'b':
-			/*
 			{
-				int j, n = osc_atom_s_sizeof(a);
-				char *data = osc_atom_s_getBlob(a);
-				for(j = 0; j < n - 4; j++){
-					atom_setlong(ptr++, (long)data[j + 4]);
+				char *blob = osc_atom_s_getBlob(a);
+				int32_t size = ntoh32(*((int32_t *)blob));
+				atom_setlong(ptr++, size);
+				for(int j = 0; j < size; j++){
+					atom_setlong(ptr++, (long)blob[j + 4]);
 				}
 			}
-			 */
 			break;
 		case OSC_BUNDLE_TYPETAG:
 			{
