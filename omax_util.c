@@ -63,7 +63,8 @@ extern t_symbol *atom_getsym(t_atom *atom);
 extern t_atomtype atom_gettype(t_atom *atom);
 #else
 #define NUMATOMSINMESS 2
-
+#include "ext_dictionary.h"
+#include "ext_dictobj.h"
 #endif
 
 
@@ -408,6 +409,28 @@ void omax_util_maxAtomToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *max_atom)
 	case A_LONG:
 		osc_atom_u_setInt32(*osc_atom, atom_getlong(max_atom));
 		break;
+#ifndef OMAX_PD_VERSION
+	case A_OBJ:
+		{
+			t_dictionary *dict2 = object_dictionaryarg(1, max_atom);
+			if(dict2){
+				t_osc_bndl_u *bndl2_u = osc_bundle_u_alloc();
+				omax_dict_dictionaryToOSC(dict2, bndl2_u);
+				osc_atom_u_setBndl_u(*osc_atom, bndl2_u);
+				//long len = 0; 
+				//char *bndl2 = NULL;
+				//osc_bundle_u_serialize(bndl2_u, &len, &bndl2);
+				//t_osc_msg_u *msg = osc_message_u_alloc();
+				//osc_message_u_setAddress(msg, addy);
+				//osc_message_u_appendBndl(msg, len, bndl2);
+				//osc_bundle_u_addMsg(bndl_u, msg);
+				//osc_bundle_u_free(bndl2_u);
+				//osc_mem_free(bndl2);
+				//continue;
+			}
+		}
+		break;
+#endif
 	case A_SYM:
 		{
 #ifdef OMAX_PD_VERSION
@@ -426,7 +449,7 @@ void omax_util_maxAtomToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *max_atom)
 				osc_atom_u_setString(*osc_atom, s->s_name);
 				break;
 			}
-#endif
+#endif						\
 			// intentional fall-through to default
 		}
 	default:

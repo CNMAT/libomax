@@ -239,6 +239,7 @@ void omax_dict_dictionaryToOSC(t_dictionary *dict, t_osc_bndl_u *bndl_u)
 			long argc = 0;
 			t_atom *argv = NULL;
 			dictionary_getatoms(dict, keys[i], &argc, &argv);
+			/*
 			if(argc == 1){
 				if(atom_gettype(argv) == A_OBJ){
 					t_dictionary *dict2 = object_dictionaryarg(1, argv);
@@ -258,6 +259,7 @@ void omax_dict_dictionaryToOSC(t_dictionary *dict, t_osc_bndl_u *bndl_u)
 					}
 				}
 			}
+			*/
 			t_osc_msg_u *msg = NULL;
 			omax_util_maxAtomsToOSCMsg_u(&msg, gensym(addy), argc, argv);
 			osc_bundle_u_addMsg(bndl_u, msg);
