@@ -11,7 +11,7 @@ OPD_HFILES = $(foreach F, $(OPD_BASENAMES), $(F).h)
 C74SUPPORT = ../max6-sdk/c74support
 MAX_INCLUDES = $(C74SUPPORT)/max-includes 
 MSP_INCLUDES = $(C74SUPPORT)/msp-includes
-PD_INCLUDES = ../pd-src/src
+PD_INCLUDES = ../../pure-data/src
 
 MAC_SYSROOT = MacOSX10.8.sdk 
 #MAC-CFLAGS = -arch i386 -arch x86_64 -O3 -funroll-loops -isysroot /Users/r/Documents/dev-lib/SDKs/$(MAC_SYSROOT) -mmacosx-version-min=10.5 -std=c99 
@@ -37,6 +37,12 @@ win: CC = i686-w64-mingw32-gcc
 win: I = $(WIN-INCLUDES)
 win: libomax.a #libopd.a
 win: LIBTOOL = ar cru libomax.a $(OMAX_OBJECTS)
+
+linux: CC = clang
+linux: CFLAGS_PD += -DOMAX_PD_VERSION -funroll-loops -std=c99
+linux: I = -I$(PD_INCLUDES) -I../libo
+linux: libopd.a
+linux: LIBTOOL_PD = libtool --tag=CC --mode=link clang -static -o libopd.a $(OPD_OBJECTS)
 
 .phony: printomax printopd
 printomax:
