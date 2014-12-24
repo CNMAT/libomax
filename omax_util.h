@@ -61,6 +61,10 @@
 extern "C" {
 #endif
 
+#if defined WIN_VERSION || defined(__linux__)
+char *strsep(char **stringp, const char *delim);
+#endif
+
 void omax_util_oscLenAndPtr2Atoms(t_atom *argv, long len, char *ptr);
 void omax_util_curlies2hashBrackets(char **ptr, long bufsize);
 void omax_util_hashBrackets2Curlies(char *s);

@@ -11,7 +11,7 @@ OPD_HFILES = $(foreach F, $(OPD_BASENAMES), $(F).h)
 C74SUPPORT = ../max6-sdk/c74support
 MAX_INCLUDES = $(C74SUPPORT)/max-includes 
 MSP_INCLUDES = $(C74SUPPORT)/msp-includes
-PD_INCLUDES = ../../pure-data/src
+PD_INCLUDES = ../pure-data/src
 
 MAC_SYSROOT = MacOSX10.8.sdk 
 #MAC-CFLAGS = -arch i386 -arch x86_64 -O3 -funroll-loops -isysroot /Users/r/Documents/dev-lib/SDKs/$(MAC_SYSROOT) -mmacosx-version-min=10.5 -std=c99 
