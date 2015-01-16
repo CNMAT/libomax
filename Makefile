@@ -39,7 +39,7 @@ win: libomax.a #libopd.a
 win: LIBTOOL = ar cru libomax.a $(OMAX_OBJECTS)
 
 linux: CC = clang
-linux: CFLAGS_PD += -DOMAX_PD_VERSION -funroll-loops -std=c99
+linux: CFLAGS_PD += -DOMAX_PD_VERSION -funroll-loops -std=c99 -fPIC
 linux: I = -I$(PD_INCLUDES) -I../libo
 linux: libopd.a
 #linux: LIBTOOL_PD = libtool --tag=CC --mode=link clang -all-static -o libopd.a $(OPD_OBJECTS)
