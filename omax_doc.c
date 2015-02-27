@@ -106,15 +106,15 @@ void _omax_doc_outletDoc(void *outlet,
 		osc_message_u_appendString(msg_seealso, see_also[i]);
 	}
 	osc_bundle_u_addMsg(bndl, msg_seealso);
-	long len = 0;
-	char *bndl_s = NULL;
-	osc_bundle_u_serialize(bndl, &len, &bndl_s);
-	omax_util_outletOSC(outlet, len, bndl_s);
+	//long len = 0;
+	//char *bndl_s = NULL;
+	t_osc_bndl_s *bs = osc_bundle_u_serialize(bndl);
+	if(bs){
+		omax_util_outletOSC(outlet, osc_bundle_s_getLen(bs), osc_bundle_s_getPtr(bs));
+		osc_bundle_s_deepFree(bs);
+	}
 	if(bndl){
 		osc_bundle_u_free(bndl);
-	}
-	if(bndl_s){
-		osc_mem_free(bndl_s);
 	}
 }
 

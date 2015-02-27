@@ -277,15 +277,18 @@ void omax_dict_processDictionary(void *x, t_symbol *name, void (*fp)(void *x, t_
 	//#endif
 	t_osc_bndl_u *bndl_u = osc_bundle_u_alloc();
 	omax_dict_dictionaryToOSC(dict, bndl_u);
-	long len = 0;
-	char *bndl = NULL;
-	osc_bundle_u_serialize(bndl_u, &len, &bndl);
+	//long len = 0;
+	//char *bndl = NULL;
+	t_osc_bndl_s *bs = osc_bundle_u_serialize(bndl_u);
 	t_atom a[2];
-	atom_setlong(a, len);
-	atom_setlong(a + 1, (long)bndl);
-	fp(x, NULL, 2, a);
+	if(bs){
+		atom_setlong(a, osc_bundle_s_getLen(bs));
+		atom_setlong(a + 1, (long)osc_bundle_s_getPtr(bs));
+		fp(x, NULL, 2, a);
+		osc_bundle_s_deepFree(bs);
+	}
 	osc_bundle_u_free(bndl_u);
-	osc_mem_free(bndl);
+	//osc_mem_free(bndl);
 	//#ifdef WIN_VERSION
 	//dictobj_release(dict);
 	//#else

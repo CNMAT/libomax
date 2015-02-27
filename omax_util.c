@@ -47,6 +47,7 @@
 #include "osc_message_iterator_s.h"
 #include "osc_atom_s.h"
 #include "omax_util.h"
+#include "omax_dict.h"
 
 
 #ifdef OMAX_PD_VERSION
@@ -174,15 +175,16 @@ t_osc_err omax_util_outletOSC_u(void *outlet, t_osc_bndl_u *bndl)
 	if(!omax_util_ps_FullPacket){
 		omax_util_ps_FullPacket = gensym("FullPacket");
 	}
-	long len = 0;
-	char *ptr = NULL;
-	t_osc_err e = osc_bundle_u_serialize(bndl, &len, &ptr);
-	if(e){
-		return e;
-	}
-	if(len && ptr){
-		omax_util_outletOSC(outlet, len, ptr);
-		osc_mem_free(ptr);
+	//long len = 0;
+	//char *ptr = NULL;
+	//t_osc_err e = osc_bundle_u_serialize(bndl, &len, &ptr);
+	//if(e){
+	//return e;
+	//}
+	t_osc_bndl_s *bs = osc_bundle_u_serialize(bndl);
+	if(bs){
+		omax_util_outletOSC(outlet, osc_bundle_s_getLen(bs), osc_bundle_s_getPtr(bs));
+		osc_bundle_s_deepFree(bs);
 	}
 	return OSC_ERR_NONE;
 }

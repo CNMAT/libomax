@@ -146,7 +146,7 @@ void omax_FullPacket(t_object *ob, long len, long ptr)
 
 	memset(buf, '\0', len);
 	c.buf = buf;
-	osc_bundle_setBundleID(buf);
+	osc_bundle_s_setBundleID(buf);
 	c.bufpos = OSC_HEADER_SIZE;
 	c.should_output_state = 0;
 	t_osc_err e = osc_bundle_s_getMessagesWithCallback(len, (char *)ptr, omax_FullPacketCallback, (void *)(&c));
@@ -318,7 +318,7 @@ void omax_schemaList(t_object *ob, t_symbol *msg, int argc, t_atom *argv)
 		memcpy(bufptr, sl->addresses[i].buf, sl->addresses[i].bufpos);
 		bufptr += sl->addresses[i].bufpos;
 	}
-	osc_bundle_setBundleID(buf);
+	osc_bundle_s_setBundleID(buf);
 	// put timestamp in place...
 
 	/*	
@@ -413,7 +413,7 @@ void omax_object_ioReport(t_object *x, t_symbol *msg, int argc, t_atom *argv)
 		return;
 	}
 	char bundle[buflen + OSC_HEADER_SIZE];
-	osc_bundle_setBundleID(bundle);
+	osc_bundle_s_setBundleID(bundle);
 	memcpy(bundle + OSC_HEADER_SIZE, buf, buflen);
 	void *outlet = omax_object_getInfoOutlet(x);
 	if(outlet){
@@ -501,7 +501,12 @@ void omax_object_createIOReport(t_object *x, t_symbol *msg, int argc, t_atom *ar
 		}
 	}
 	//*buflen = pos;
-	osc_bundle_u_serialize(bndl_u, buflen, buf);
+	t_osc_bndl_s *bs = osc_bundle_u_serialize(bndl_u);
+	if(bs){
+		*buflen = osc_bundle_s_getLen(bs);
+		*buf = osc_bundle_s_getPtr(bs);
+		osc_bundle_s_free(bs);
+	}
 	if(bndl_u){
 		osc_bundle_u_free(bndl_u);
 	}
@@ -567,19 +572,17 @@ void omax_outputState(t_object *x)
 			}
 		}
 	}
-	long len = 0;
-	char *buf = NULL;
-	osc_bundle_u_serialize(bndl_u, &len, &buf);
+	//long len = 0;
+	//char *buf = NULL;
+	t_osc_bndl_s *bs = osc_bundle_u_serialize(bndl_u);
 	void *outlet = omax_object_getInfoOutlet(x);
-	if(outlet){
-		omax_util_outletOSC(outlet, len, buf);
+	if(outlet && bs){
+		omax_util_outletOSC(outlet, osc_bundle_s_getLen(bs), osc_bundle_s_getPtr(bs));
+		osc_bundle_s_deepFree(bs);
 	}
 	if(bndl_u){
 		osc_bundle_u_free(bndl_u);
  	}
-	if(buf){
-		osc_mem_free(buf);
-	}
 }
 
 t_max_err omax_notify(t_object *x, t_symbol *s, t_symbol *msg, void *sender, void *data)

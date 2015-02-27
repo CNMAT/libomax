@@ -13,14 +13,14 @@ MAX_INCLUDES = $(C74SUPPORT)/max-includes
 MSP_INCLUDES = $(C74SUPPORT)/msp-includes
 PD_INCLUDES = ../pd-src/src
 
-MAC_SYSROOT = MacOSX10.8.sdk 
+MAC_SYSROOT = MacOSX10.10.sdk 
 #MAC-CFLAGS = -arch i386 -arch x86_64 -O3 -funroll-loops -isysroot /Users/r/Documents/dev-lib/SDKs/$(MAC_SYSROOT) -mmacosx-version-min=10.5 -std=c99 
 MAC_PATH_TO_SDK = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs
-MAC-CFLAGS = -arch i386 -arch x86_64 -O3 -funroll-loops -isysroot $(MAC_PATH_TO_SDK)/$(MAC_SYSROOT) -mmacosx-version-min=10.5 -std=c99 
+MAC-CFLAGS = -arch i386 -arch x86_64 -O3 -funroll-loops -isysroot $(MAC_PATH_TO_SDK)/$(MAC_SYSROOT) -mmacosx-version-min=10.9 -std=c99 
 MAC-PD-CFLAGS = $(MAC-CFLAGS) -DOMAX_PD_VERSION
 WIN-CFLAGS = -O3 -funroll-loops -mno-cygwin -DWIN_VERSION -DWIN_EXT_VERSION -U__STRICT_ANSI__ -U__ANSI_SOURCE -std=c99
 
-MAC-INCLUDES = -I$(MAX_INCLUDES) -I$(MSP_INCLUDES) -I$(PD_INCLUDES) -I../libo -F/System/Library/Frameworks -I/usr/include
+MAC-INCLUDES = -I$(MAX_INCLUDES) -I$(MSP_INCLUDES) -I$(PD_INCLUDES) -I../libo -I/usr/include #-F/System/Library/Frameworks 
 WIN-INCLUDES = -I$(MAX_INCLUDES) -I$(MSP_INCLUDES) -I../libo -I/usr/include
 
 all: CFLAGS += $(MAC-CFLAGS)
