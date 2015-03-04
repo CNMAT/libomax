@@ -25,11 +25,15 @@
 
 */
 
+#if defined(__linux__)
+#include <string.h>
+#else
 #ifndef WIN_VERSION
 #include <Carbon/Carbon.h>
 #include <CoreServices/CoreServices.h>
 #else
 #include <windows.h>
+#endif
 #endif
 
 #include <inttypes.h>

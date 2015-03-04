@@ -26,9 +26,12 @@
 */
 
 
+#if defined(__linux__)
+#else
 #ifndef WIN_VERSION
 #include <Carbon/Carbon.h>
 #include <CoreServices/CoreServices.h>
+#endif
 #endif
 
 #include <inttypes.h>

@@ -38,6 +38,12 @@ win: I = $(WIN-INCLUDES)
 win: libomax.a #libopd.a
 win: LIBTOOL = ar cru libomax.a $(OMAX_OBJECTS)
 
+linux: CC = clang
+linux: CFLAGS_PD += -DOMAX_PD_VERSION -funroll-loops -std=c99 -fPIC
+linux: I = -I$(PD_INCLUDES) -I../libo
+linux: libopd.a
+linux: LIBTOOL_PD = ar scru libopd.a $(OPD_OBJECTS)
+
 .phony: printomax printopd
 printomax:
 	$(info )
