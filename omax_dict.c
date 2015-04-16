@@ -62,84 +62,86 @@ static t_max_err (*omax_dict_dictobj_release)(t_dictionary *d);
 #ifdef WIN_VERSION
 int omax_dict_resolveDictStubs(void)
 {
-  //something like this, i assume
+	//something like this, i assume
 
-// A simple program that uses LoadLibrary and 
-// GetProcAddress to access myPuts from Myputs.dll. 
+	// A simple program that uses LoadLibrary and 
+	// GetProcAddress to access myPuts from Myputs.dll. 
  
-//#include <windows.h> 
-//#include <stdio.h> 
+	//#include <windows.h> 
+	//#include <stdio.h> 
  
-//typedef int (__cdecl *MYPROC)(LPWSTR); 
+	//typedef int (__cdecl *MYPROC)(LPWSTR); 
  
-//int main( void ) 
-//{ 
-  if(omax_dict_dictStubsResolved){
-    return omax_dict_haveDict;
-  }
-  omax_dict_dictStubsResolved = 1;
-  char *dllpath = NULL;
-  short version = maxversion();
-    HINSTANCE hinstLib; 
-    //MYPROC ProcAdd; 
-    BOOL fFreeResult, fRunTimeLinkSuccess = FALSE; 
-
-    if((version & 0xFF0) == 0x610){
-      dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max 6.1\\support\\MaxAPI.dll";
-    }else if((version & 0xFF0) == 0x600){
-      dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max 6.0\\support\\MaxAPI.dll";
-    }else if((version & 0xF00) == 0x500){
-      return 0;
-      dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max 5.0\\support\\MaxAPI.dll";
-    }else{
-      return 0;
-    }
- 
-    // Get a handle to the DLL module.
-    hinstLib = LoadLibrary(TEXT(dllpath));
- 
-    // If the handle is valid, try to get the function address.
- 
-    if (hinstLib != NULL) 
-    { 
-        omax_dict_dictobj_findregistered_retain = GetProcAddress(hinstLib, "dictobj_findregistered_retain"); 
-	if(!omax_dict_dictobj_findregistered_retain){
-	  return 0;
+	//int main( void ) 
+	//{ 
+	if(omax_dict_dictStubsResolved){
+		return omax_dict_haveDict;
 	}
+	omax_dict_dictStubsResolved = 1;
+	char *dllpath = NULL;
+	short version = maxversion();
+	HINSTANCE hinstLib; 
+	//MYPROC ProcAdd; 
+	BOOL fFreeResult, fRunTimeLinkSuccess = FALSE; 
 
-        omax_dict_dictobj_release = GetProcAddress(hinstLib, "dictobj_release"); 
-	if(!omax_dict_dictobj_release){
-	  return 0;
+	if((version & 0xFF0) == 0x700){
+		dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max\\support\\MaxAPI.dll";
+	}else if((version & 0xFF0) == 0x610){
+		dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max 6.1\\support\\MaxAPI.dll";
+	}else if((version & 0xFF0) == 0x600){
+		dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max 6.0\\support\\MaxAPI.dll";
+	}else if((version & 0xF00) == 0x500){
+		return 0;
+		dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max 5.0\\support\\MaxAPI.dll";
+	}else{
+		return 0;
 	}
-
-        omax_dict_dictobj_register = GetProcAddress(hinstLib, "dictobj_register"); 
-	if(!omax_dict_dictobj_register){
-	  return 0;
-	}
-	omax_dict_haveDict = 1;
  
-        // If the function address is valid, call the function.
+	// Get a handle to the DLL module.
+	hinstLib = LoadLibrary(TEXT(dllpath));
+ 
+	// If the handle is valid, try to get the function address.
+ 
+	if (hinstLib != NULL) 
+		{ 
+			omax_dict_dictobj_findregistered_retain = GetProcAddress(hinstLib, "dictobj_findregistered_retain"); 
+			if(!omax_dict_dictobj_findregistered_retain){
+				return 0;
+			}
+
+			omax_dict_dictobj_release = GetProcAddress(hinstLib, "dictobj_release"); 
+			if(!omax_dict_dictobj_release){
+				return 0;
+			}
+
+			omax_dict_dictobj_register = GetProcAddress(hinstLib, "dictobj_register"); 
+			if(!omax_dict_dictobj_register){
+				return 0;
+			}
+			omax_dict_haveDict = 1;
+ 
+			// If the function address is valid, call the function.
+			/*
+			  if (NULL != ProcAdd) 
+			  {
+			  fRunTimeLinkSuccess = TRUE;
+			  (ProcAdd) (L"Message sent to the DLL function\n"); 
+			  }
+			*/
+			// Free the DLL module.
+ 
+			fFreeResult = FreeLibrary(hinstLib); 
+		} 
+
+	// If unable to call the DLL function, use an alternative.
 	/*
-        if (NULL != ProcAdd) 
-        {
-            fRunTimeLinkSuccess = TRUE;
-            (ProcAdd) (L"Message sent to the DLL function\n"); 
-        }
+	  if (! fRunTimeLinkSuccess) 
+	  printf("Message printed from executable\n"); 
 	*/
-        // Free the DLL module.
- 
-        fFreeResult = FreeLibrary(hinstLib); 
-    } 
+	return omax_dict_haveDict;
 
-    // If unable to call the DLL function, use an alternative.
-    /*
-    if (! fRunTimeLinkSuccess) 
-        printf("Message printed from executable\n"); 
-    */
-    return omax_dict_haveDict;
-
-    //}
-    //*/
+	//}
+	//*/
 }
 #else
 int omax_dict_resolveDictStubs(void)
@@ -152,7 +154,9 @@ int omax_dict_resolveDictStubs(void)
 	short version = maxversion();
 
 	// I don't think this will work for standalones
-	if((version & 0xFF0) == 0x610){
+	if((version & 0xFF0) == 0x700){
+		frameworkpath = "/Applications/Max.app/Contents/Frameworks/MaxAPI.framework";
+	}else if((version & 0xFF0) == 0x610){
 		frameworkpath = "/Applications/Max 6.1/Max.app/Contents/Frameworks/MaxAPI.framework";
 	}else if((version & 0xFF0) == 0x600){
 		frameworkpath = "/Applications/Max6/Max.app/Contents/Frameworks/MaxAPI.framework";
@@ -240,25 +244,25 @@ void omax_dict_dictionaryToOSC(t_dictionary *dict, t_osc_bndl_u *bndl_u)
 			t_atom *argv = NULL;
 			dictionary_getatoms(dict, keys[i], &argc, &argv);
 			/*
-			if(argc == 1){
-				if(atom_gettype(argv) == A_OBJ){
-					t_dictionary *dict2 = object_dictionaryarg(1, argv);
-					if(dict2){
-						t_osc_bndl_u *bndl2_u = osc_bundle_u_alloc();
-						omax_dict_dictionaryToOSC(dict2, bndl2_u);
-						long len = 0; 
-						char *bndl2 = NULL;
-						osc_bundle_u_serialize(bndl2_u, &len, &bndl2);
-						t_osc_msg_u *msg = osc_message_u_alloc();
-						osc_message_u_setAddress(msg, addy);
-						osc_message_u_appendBndl(msg, len, bndl2);
-						osc_bundle_u_addMsg(bndl_u, msg);
-						osc_bundle_u_free(bndl2_u);
-						osc_mem_free(bndl2);
-						continue;
-					}
-				}
-			}
+			  if(argc == 1){
+			  if(atom_gettype(argv) == A_OBJ){
+			  t_dictionary *dict2 = object_dictionaryarg(1, argv);
+			  if(dict2){
+			  t_osc_bndl_u *bndl2_u = osc_bundle_u_alloc();
+			  omax_dict_dictionaryToOSC(dict2, bndl2_u);
+			  long len = 0; 
+			  char *bndl2 = NULL;
+			  osc_bundle_u_serialize(bndl2_u, &len, &bndl2);
+			  t_osc_msg_u *msg = osc_message_u_alloc();
+			  osc_message_u_setAddress(msg, addy);
+			  osc_message_u_appendBndl(msg, len, bndl2);
+			  osc_bundle_u_addMsg(bndl_u, msg);
+			  osc_bundle_u_free(bndl2_u);
+			  osc_mem_free(bndl2);
+			  continue;
+			  }
+			  }
+			  }
 			*/
 			t_osc_msg_u *msg = NULL;
 			omax_util_maxAtomsToOSCMsg_u(&msg, gensym(addy), argc, argv);
@@ -270,9 +274,9 @@ void omax_dict_dictionaryToOSC(t_dictionary *dict, t_osc_bndl_u *bndl_u)
 
 void omax_dict_processDictionary(void *x, t_symbol *name, void (*fp)(void *x, t_symbol *msg, int argc, t_atom *argv))
 {
-  //#ifdef WIN_VERSION
-  //t_dictionary *dict = omax_dict_dictobj_findregistered_retain(name);
-  //#else
+	//#ifdef WIN_VERSION
+	//t_dictionary *dict = omax_dict_dictobj_findregistered_retain(name);
+	//#else
 	t_dictionary *dict = omax_dict_dictobj_findregistered_retain(name);
 	//#endif
 	t_osc_bndl_u *bndl_u = osc_bundle_u_alloc();
