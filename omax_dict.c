@@ -154,7 +154,8 @@ int omax_dict_resolveDictStubs(void)
 	short version = maxversion();
 
 	// I don't think this will work for standalones
-	if((version & 0xFF0) == 0x700){
+	if((version & 0xF00) == 0x700){
+		printf("7\n");
 		frameworkpath = "/Applications/Max.app/Contents/Frameworks/MaxAPI.framework";
 	}else if((version & 0xFF0) == 0x610){
 		frameworkpath = "/Applications/Max 6.1/Max.app/Contents/Frameworks/MaxAPI.framework";
