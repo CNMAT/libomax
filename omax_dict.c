@@ -84,7 +84,9 @@ int omax_dict_resolveDictStubs(void)
 	//MYPROC ProcAdd; 
 	BOOL fFreeResult, fRunTimeLinkSuccess = FALSE; 
 
-	if((version & 0xFF0) == 0x700){
+	if((version & 0xFF0) == 0x710){
+		dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max 7\\resources\\support\\MaxAPI.dll";
+	}else if((version & 0xFF0) == 0x700){
 		dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max\\support\\MaxAPI.dll";
 	}else if((version & 0xFF0) == 0x610){
 		dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max 6.1\\support\\MaxAPI.dll";
