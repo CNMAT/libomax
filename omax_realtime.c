@@ -88,7 +88,7 @@ void omax_realtime_clock_register(void* trigger)
 		t_dspchain *c = dspchain_get();
 		if(c) {
 			if(c->c_patcher != 0) {
-				error("attempting to use realtime object as master clock in a poly~, bad idea!");
+				//error("attempting to use realtime object as master clock in a poly~, bad idea!");
 			}
 		}
         
