@@ -325,6 +325,7 @@ int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 		case 'd':
 			atom_setfloat(ptr++, osc_atom_s_getFloat(a)); 
 			break;
+		case 't':
 		case 's':		
 			{
 				int len = osc_atom_s_getStringLen(a);
@@ -375,6 +376,8 @@ int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 				*/
 			}
 			break;
+		default:
+			error("unknown OSC type %c (%d)\n", osc_atom_s_getTypetag(a), osc_atom_s_getTypetag(a));
 		}
 	}
 	osc_msg_it_s_destroy(it);
