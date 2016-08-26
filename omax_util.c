@@ -316,6 +316,8 @@ int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 		case 'I':
 		case 'h':
 		case 'H':
+		case 'u':
+		case 'U':
 		case 'T':
 		case 'F':
 		case 'N':
