@@ -280,7 +280,7 @@ void omax_dict_processDictionary(void *x, t_symbol *name, void (*fp)(void *x, t_
 	//#ifdef WIN_VERSION
 	//t_dictionary *dict = omax_dict_dictobj_findregistered_retain(name);
 	//#else
-	t_dictionary *dict = omax_dict_dictobj_findregistered_retain(name);
+	t_dictionary *dict = dictobj_findregistered_retain(name);//omax_dict_dictobj_findregistered_retain(name);
 	//#endif
 	t_osc_bndl_u *bndl_u = osc_bundle_u_alloc();
 	omax_dict_dictionaryToOSC(dict, bndl_u);
@@ -299,7 +299,7 @@ void omax_dict_processDictionary(void *x, t_symbol *name, void (*fp)(void *x, t_
 	//#ifdef WIN_VERSION
 	//dictobj_release(dict);
 	//#else
-	omax_dict_dictobj_release(dict);
+	dictobj_release(dict);//omax_dict_dictobj_release(dict);
 	//#endif
 }
 
