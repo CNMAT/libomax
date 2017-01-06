@@ -18,7 +18,7 @@ MAC_SYSROOT = MacOSX10.11.sdk
 MAC_PATH_TO_SDK = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs
 MAC-CFLAGS = -arch i386 -arch x86_64 -O3 -funroll-loops -isysroot $(MAC_PATH_TO_SDK)/$(MAC_SYSROOT) -mmacosx-version-min=10.9 -std=c99 
 MAC-PD-CFLAGS = $(MAC-CFLAGS) -DOMAX_PD_VERSION
-WIN-CFLAGS = -O3 -funroll-loops -mno-cygwin -DWIN_VERSION -DWIN_EXT_VERSION -U__STRICT_ANSI__ -U__ANSI_SOURCE -std=c99
+WIN-CFLAGS = -O3 -funroll-loops -DWIN_VERSION -DWIN_EXT_VERSION -U__STRICT_ANSI__ -U__ANSI_SOURCE -std=c99 -DWIN32_LEAN_AND_MEAN
 
 MAC-INCLUDES = -I$(MAX_INCLUDES) -I$(MSP_INCLUDES) -I$(PD_INCLUDES) -I../libo -I/usr/include #-F/System/Library/Frameworks 
 WIN-INCLUDES = -I$(MAX_INCLUDES) -I$(MSP_INCLUDES) -I../libo -I/usr/include
