@@ -40,14 +40,14 @@ win: CC = i686-w64-mingw32-gcc
 win: I = $(WIN-INCLUDES)
 win: libomax.a #libopd.a
 win: LIBTOOL = ar cru libomax.a $(OMAX_OBJECTS)
-win: PLACE = rm -f libs/i686/*.a; cp libomax.a libs/i686
+win: PLACE = rm -f libs/i686/*.a; mkdir -p libs/i686; cp libomax.a libs/i686
 
 win64: CFLAGS += $(WIN64-CFLAGS)
 win64: CC = x86_64-w64-mingw32-gcc
 win64: I = $(WIN64-INCLUDES)
 win64: libomax.a #libopd.a
 win64: LIBTOOL = ar cru libomax.a $(OMAX_OBJECTS)
-win64: PLACE = rm -f libs/x86_64/*.a; cp libomax.a libs/x86_64
+win64: PLACE = rm -f libs/x86_64/*.a; mkdir -p libs/x86_64; cp libomax.a libs/x86_64
 
 linux: CC = clang
 linux: CFLAGS_PD += -DOMAX_PD_VERSION -funroll-loops -std=c99 -fPIC
