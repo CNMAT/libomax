@@ -1,7 +1,7 @@
 /*
   Written by John MacCallum, The Center for New Music and Audio Technologies,
   University of California, Berkeley.  Copyright (c) 2009-11, The Regents of
-  the University of California (Regents). 
+  the University of California (Regents).
   Permission to use, copy, modify, distribute, and distribute modified versions
   of this software and its documentation without fee and without a signed
   licensing agreement, is hereby granted, provided that the above copyright
@@ -77,7 +77,7 @@ t_osc_err omax_util_maxAtomsToOSCMsg_u(t_osc_msg_u **msg, t_symbol *address, int
 int omax_util_getNumAtomsInOSCMsg(t_osc_msg_s *msg);
 int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av);
 
-int omax_util_liboErrorHandler(const char * const errorstr);
+int omax_util_liboErrorHandler(void *context, const char * const errorstr);
 
 t_osc_err omax_util_copyBundleWithSubs_u(t_osc_bndl_u **dest, t_osc_bndl_u *src, int argc, t_atom *argv, int *hassubs);
 
@@ -85,4 +85,4 @@ t_osc_err omax_util_copyBundleWithSubs_u(t_osc_bndl_u **dest, t_osc_bndl_u *src,
 }
 #endif
 
-#endif 
+#endif

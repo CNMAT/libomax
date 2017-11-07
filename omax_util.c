@@ -1,7 +1,7 @@
 /*
   Written by John MacCallum, The Center for New Music and Audio Technologies,
   University of California, Berkeley.  Copyright (c) 2010-12, The Regents of
-  the University of California (Regents). 
+  the University of California (Regents).
   Permission to use, copy, modify, distribute, and distribute modified versions
   of this software and its documentation without fee and without a signed
   licensing agreement, is hereby granted, provided that the above copyright
@@ -112,7 +112,7 @@ t_symbol *omax_util_ps_FullPacket = NULL;
 //#define __ODOT_PROFILE__
 //#include "osc_profile.h"
 
-int omax_util_liboErrorHandler(const char * const errorstr)
+int omax_util_liboErrorHandler(void *context, const char * const errorstr)
 {
 	// stupid max window doesn't respect newlines
 	int len = strlen(errorstr) + 1;
@@ -124,13 +124,13 @@ int omax_util_liboErrorHandler(const char * const errorstr)
 	while(*e){
 		if(*e == '\n'){
 			*e = '\0';
-			error("%s", s);
+			object_error((t_object*)context, "%s", s);
 			s = e + 1;
 		}
 		e++;
 	}
 	if(e != s){
-		error("%s", s);
+		object_error((t_object*)context, "%s", s);
 	}
 	return 0;
 }
@@ -152,7 +152,7 @@ void omax_util_oscLenAndPtr2Atoms(t_atom *argv, long len, char *ptr)
 	float f2 = *((float *)&i2);
 #else
 #error This is BAD BAD BAD
-#endif    
+#endif
 	atom_setfloat(argv+1, f1);
 	atom_setfloat(argv+2, f2);
 
@@ -160,7 +160,7 @@ void omax_util_oscLenAndPtr2Atoms(t_atom *argv, long len, char *ptr)
 	atom_setlong(argv, len);
 	atom_setlong(argv + 1, (long)ptr);
 #endif
-    
+
 }
 
 
@@ -231,10 +231,10 @@ int omax_util_braceError(char *s)
 
 void omax_util_hashBrackets2Curlies(char *s)
 {
-    
+
 	char c;
 	int len = strlen(s);
-    
+
 	int i, j = 0;
 	for( i = 0; i < len; i++ )
     {
@@ -251,28 +251,28 @@ void omax_util_hashBrackets2Curlies(char *s)
         }
         s[j++] = c;
     }
-    
+
 	while(j < len)
 		s[j++] = '\0';
-    
+
 }
 
 void omax_util_curlies2hashBrackets(char **ptr, long bufsize)
 {
 	//   printf("%s", __func__);
-    
+
 	char *str = (*ptr);
 	if(!str)
     {
         error("no string in buffer");
         return;
     }
-    
+
 	int i, j = 0;
 	int len = strlen(str);
 	char buf[len * 2]; //<< max possible size with every character being a { or }
 	memset(buf, '\0', len * 2);
-    
+
 	for( i = 0; i < len; i++ )
     {
         if (str[i] == '{')
@@ -325,10 +325,10 @@ int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 			break;
 		case 'f':
 		case 'd':
-			atom_setfloat(ptr++, osc_atom_s_getFloat(a)); 
+			atom_setfloat(ptr++, osc_atom_s_getFloat(a));
 			break;
 		case 't':
-		case 's':		
+		case 's':
 			{
 				int len = osc_atom_s_getStringLen(a);
 				char buf[len + 1];
@@ -340,10 +340,10 @@ int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
                 strcpy(extrabuf, bufptr);
                 char *pdbufptr = extrabuf;
                 omax_util_curlies2hashBrackets(&pdbufptr, maxsize);
-                
+
                 if(omax_util_braceError(pdbufptr))
                     return 1;
-                
+
                 atom_setsym(ptr++, gensym(extrabuf));
 #else
 				atom_setsym(ptr++, gensym(buf));
@@ -364,7 +364,7 @@ int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 			{
 				char *data = osc_atom_s_getData(a);
 				atom_setsym(ptr++, gensym("FullPacket"));
-                
+
 				t_atom bnddata[NUMATOMSINMESS];
 				omax_util_oscLenAndPtr2Atoms(bnddata, (long)ntoh32(*((uint32_t *)data)), (char *)((long)(data + 4)));
 				int i;
@@ -428,7 +428,7 @@ void omax_util_maxAtomToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *max_atom)
 				t_osc_bndl_u *bndl2_u = osc_bundle_u_alloc();
 				omax_dict_dictionaryToOSC(dict2, bndl2_u);
 				osc_atom_u_setBndl_u(*osc_atom, bndl2_u);
-				//long len = 0; 
+				//long len = 0;
 				//char *bndl2 = NULL;
 				//osc_bundle_u_serialize(bndl2_u, &len, &bndl2);
 				//t_osc_msg_u *msg = osc_message_u_alloc();
