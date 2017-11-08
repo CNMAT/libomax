@@ -114,7 +114,6 @@ t_symbol *omax_util_ps_FullPacket = NULL;
 
 int omax_util_liboErrorHandler(void *context, const char * const errorstr)
 {
-  return 0;
 
   printf("%s context ->> %p err str %s \n", __func__, context, errorstr);
 
