@@ -114,7 +114,13 @@ t_symbol *omax_util_ps_FullPacket = NULL;
 
 int omax_util_liboErrorHandler(void *context, const char * const errorstr)
 {
-	// stupid max window doesn't respect newlines
+  return 0;
+
+  printf("%s context ->> %p err str %s \n", __func__, context, errorstr);
+
+  object_error((t_object*)context, "context %p", context);
+
+  // stupid max window doesn't respect newlines
 	int len = strlen(errorstr) + 1;
 	char buf[len];
 	strncpy(buf, errorstr, len);
