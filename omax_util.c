@@ -115,9 +115,10 @@ t_symbol *omax_util_ps_FullPacket = NULL;
 int omax_util_liboErrorHandler(void *context, const char * const errorstr)
 {
 
-  printf("%s context ->> %p err str %s \n", __func__, context, errorstr);
-
-  object_error((t_object*)context, "context %p", context);
+//  printf("%s context ->> %p err str %s \n", __func__, context, errorstr);
+    //printf("%s context ->> %p e\n", __func__, context);
+    
+  //object_error((t_object*)context, "context %p", context);
 
   // stupid max window doesn't respect newlines
 	int len = strlen(errorstr) + 1;
@@ -126,10 +127,17 @@ int omax_util_liboErrorHandler(void *context, const char * const errorstr)
 
 	char *s = buf;
 	char *e = buf;
+    
+    int line = 0;
 	while(*e){
 		if(*e == '\n'){
 			*e = '\0';
-			object_error((t_object*)context, "%s", s);
+            if( line == 0 )
+                object_error((t_object*)context, "%s", s);
+            else
+                error( "^    %s", s );
+            
+            line++;
 			s = e + 1;
 		}
 		e++;
