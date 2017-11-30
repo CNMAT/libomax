@@ -143,7 +143,7 @@ int omax_util_liboErrorHandler(void *context, const char * const errorstr)
 		e++;
 	}
 	if(e != s){
-		object_error((t_object*)context, "%s", s);
+		error( "^    %s", s );
 	}
 	return 0;
 }
