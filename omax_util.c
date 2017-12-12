@@ -312,6 +312,8 @@ int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 	while(osc_msg_it_s_hasNext(it)){
 		t_osc_atom_s *a = osc_msg_it_s_next(it);
 		switch(osc_atom_s_getTypetag(a)){
+		case 'c':
+		case 'C':
 		case 'i':
 		case 'I':
 		case 'h':
