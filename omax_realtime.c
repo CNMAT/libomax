@@ -49,6 +49,8 @@
   #endif
 */
 
+//#define __OMAX_REALTIME_DEBUG__
+
 t_symbol* _sym_omax_realtime_clock_master;
 
 t_omax_realtime_clock* omax_realtime_clock_get_master()
@@ -115,9 +117,18 @@ void omax_realtime_clock_set_fc(double fc)
 
 void omax_realtime_printTimetag(t_osc_timetag t, const char *id, const char *func, long line)
 {
-	//char buf[1024];
- 	//osc_strfmt_timetag(buf, sizeof(buf), t);
-	//printf("%s:%ld: %s = %s\n", func, line, id, buf);
+#ifdef __OMAX_REALTIME_DEBUG__
+	char *buf = osc_timetag_format(t);
+	printf("%s:%ld: %s = %s (%f)\n", func, line, id, buf, osc_timetag_timetagToFloat(t));
+	osc_mem_free(buf);
+#endif
+}
+
+void omax_realtime_printFloat(double f, const char *id, const char *func, long line)
+{
+#ifdef __OMAX_REALTIME_DEBUG__
+	printf("%s:%ld: %s = %f\n", func, line, id, f);
+#endif
 }
 
 void omax_realtime_clock_tick(void *trigger)
@@ -161,60 +172,74 @@ void omax_realtime_clock_tick(void *trigger)
     
 	// reinitialize if sample rate changes or n == 0.
 	if(x->n == 0) {
-        
-		x->n = 0;
-        
 		omax_realtime_clock_set_fc(0.1);
-        
+
 		// expected time per frame
 		x->dt = x->dt0;
-        
+
 		// convert to ntp
-		//cmmjl_osc_timetag_float_to_ntp(x->dt, &dt1);
 		dt1 = osc_timetag_floatToTimetag(x->dt);
-        
+
 		// now -> t0
-		//cmmjl_osc_timetag_cpy(&(x->t0), &now); 
 		x->t0 = now;
         
 		// time we expect next frame to occur
-		//cmmjl_osc_timetag_add(&(x->t0), &dt1, &(x->t1));
 		x->t1 = osc_timetag_add(x->t0, dt1);
 		omax_realtime_printTimetag(x->t0, "x->t0", __func__, __LINE__);
 		omax_realtime_printTimetag(x->t1, "x->t1", __func__, __LINE__);
+
+		// no error on this tick
+		x->dt_error = loop_err = 0.;
+
+		// advance frame count
+		x->n++;
+		
+		// everything in the struct has been updated, so just return
+		return;
 	}
-    
-	//loop_err = cmmjl_osc_timetag_distance_to_float(&now, &(x->t1));
-	//if(now > x->t1){
+
+	// compare the time now to what we expected it to be on the last tick
         if(osc_timetag_compare(now, x->t1) == 1){
 		loop_err = osc_timetag_timetagToFloat(osc_timetag_subtract(now, x->t1));
 	}else{
 		loop_err = osc_timetag_timetagToFloat(osc_timetag_subtract(x->t1, now)) * -1.;
 	}
-	//printf("%s:%d: loop_err = %f\n", __func__, __LINE__, loop_err);
+	omax_realtime_printFloat(loop_err, "loop_err", __func__, __LINE__);
 
-	/* alternate code to calculate loop_err
-	// flip sign for subtraction
-	cmmjl_osc_timetag_cpy(&t1_neg, &(x->t1));
-	t1_neg.sign = -1;
-    
-	// calculate loop error
-	cmmjl_osc_timetag_add(&now, &t1_neg, &loop_err_ntp);
-	loop_err = cmmjl_osc_timetag_ntp_to_float(&loop_err_ntp);
-	*/
-    
+	// if the error is this big, then something bad has happened
+	// such as a buffer-underrun
+	// or the system clock was adjusted by a lot
+	if(fabs(loop_err) > (2.*x->dt)) {
+		omax_realtime_printFloat(2. * x->dt, "large loop error > 2. * x->dt", __func__, __LINE__);
+		if(fabs(loop_err) > (5.*x->dt)) {
+			omax_realtime_printFloat(5. * x->dt, "very large loop error > 5. * x->dt: hard reset", __func__, __LINE__);
+			x->dt = x->dt0;
+			dt1 = osc_timetag_floatToTimetag(x->dt);
+			x->t0 = now;
+			x->t1 = osc_timetag_add(x->t0, dt1);
+			x->dt_error = loop_err = 0.;
+			x->n = 1;
+			omax_realtime_clock_set_fc(0.1);
+			// everything in the struct has been updated, so just return
+			return;
+		} else {
+			// soft reset by backing off the filter for a while
+			omax_realtime_printFloat(5. * x->dt, "large loop error <= 5. * x->dt: soft reset", __func__, __LINE__);
+			x->n = 10;
+			omax_realtime_clock_set_fc(0.1);
+			// x->n = 100;
+			// omax_realtime_clock_set_fc(0.01);
+		}
+	}
+
 	// update loop
 	// t1 -> t0
-	//cmmjl_osc_timetag_cpy(&(x->t0), &(x->t1));
 	x->t0 = x->t1;
-	//omax_realtime_printTimetag(x->t0, "x->t0", __func__, __LINE__);
+	omax_realtime_printTimetag(x->t0, "x->t0", __func__, __LINE__);
     
 	// estimate t1
-	//cmmjl_osc_timetag_float_to_ntp(loop_err * x->b + x->dt, &dt1);
 	dt1 = osc_timetag_floatToTimetag(loop_err * x->b + x->dt);
-	//cmmjl_osc_timetag_add(&dt1, &(x->t1), &t1_next);
 	t1_next = osc_timetag_add(dt1, x->t1);
-	//cmmjl_osc_timetag_cpy(&(x->t1), &t1_next);
 	x->t1 = t1_next;
 	omax_realtime_printTimetag(t1_next, "t1_next", __func__, __LINE__);
 
@@ -226,24 +251,28 @@ void omax_realtime_clock_tick(void *trigger)
 	// if the error is this big, then something bad has happened
 	// such as a buffer-underrun
 	// or the system clock was adjusted by a lot
-	if(fabs(loop_err) > (2.*x->dt)) {
-		if(fabs(loop_err) > (5.*x->dt)) {
-			// hard reset to initial conditions
-			x->dt = x->dt0;
-			//cmmjl_osc_timetag_float_to_ntp(x->dt, &dt1);
-			dt1 = osc_timetag_floatToTimetag(x->dt);
-			//cmmjl_osc_timetag_cpy(&(x->t0), &now); 
-			x->t0 = now;
-			//cmmjl_osc_timetag_add(&(x->t0), &dt1, &(x->t1));
-			x->t1 = osc_timetag_add(x->t0, dt1);
-			x->n = 0;
-			omax_realtime_clock_set_fc(0.01);
-		} else {
-			// soft reset by backing off the filter for a while
-			x->n = 100;
-			omax_realtime_clock_set_fc(0.01);
-		}
-	}
+	// printf("%s:%d: loop_err (%f) > %f == %d\n", __func__, __LINE__, fabs(loop_err), 2. * x->dt, fabs(loop_err) > (5.*x->dt));
+	// if(fabs(loop_err) > (2.*x->dt)) {
+	// 	printf("%s:%d: loop_err (%f) > %f\n", __func__, __LINE__, fabs(loop_err), 2. * x->dt);
+	// 	if(fabs(loop_err) > (5.*x->dt)) {
+	// 		printf("%s:%d: hard reset\n", __func__, __LINE__);
+	// 		// hard reset to initial conditions
+	// 		x->dt = x->dt0;
+	// 		//cmmjl_osc_timetag_float_to_ntp(x->dt, &dt1);
+	// 		dt1 = osc_timetag_floatToTimetag(x->dt);
+	// 		//cmmjl_osc_timetag_cpy(&(x->t0), &now); 
+	// 		x->t0 = now;
+	// 		//cmmjl_osc_timetag_add(&(x->t0), &dt1, &(x->t1));
+	// 		x->t1 = osc_timetag_add(x->t0, dt1);
+	// 		x->n = 0;
+	// 		omax_realtime_clock_set_fc(0.01);
+	// 	} else {
+	// 		printf("%s:%d: soft reset\n", __func__, __LINE__);
+	// 		// soft reset by backing off the filter for a while
+	// 		x->n = 100;
+	// 		omax_realtime_clock_set_fc(0.01);
+	// 	}
+	// }
     
 	// adjust filter cutoff dynamically
 	if(x->n == 100) {
