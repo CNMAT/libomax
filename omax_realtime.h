@@ -60,12 +60,14 @@ typedef struct _omax_realtime_clock {
 t_omax_realtime_clock* omax_realtime_clock_get_master();
 
 // initialize clock with a dt0
+// this goes in an object's class creation function
 void omax_realtime_clock_init();
 
 // set the filter cutoff, not user-adjustable
 void omax_realtime_clock_set_fc(double fc0);
 
 // update the clock
+// call this before calling now or next
 void omax_realtime_clock_tick(void *x);
 
 // when is now
@@ -78,6 +80,7 @@ void omax_realtime_clock_next(t_osc_timetag *t);
 double omax_realtime_clock_dt();
 
 // register interest in the clock
+// this goes in an object's instance creation function
 void omax_realtime_clock_register();
 
 #endif
