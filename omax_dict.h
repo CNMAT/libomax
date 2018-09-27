@@ -81,7 +81,7 @@ t_dictionary *(*omax_dict_dictobj_register)(t_dictionary *d, t_symbol **name);
 int omax_dict_resolveDictStubs(void);
 void omax_dict_dictionaryToOSC(t_dictionary *dict, t_osc_bndl_u *bndl_u);
 void omax_dict_processDictionary(void *x, t_symbol *name, void (*fp)(void *x, t_symbol *msg, int argc, t_atom *argv));
-void omax_dict_bundleToDictionary(t_osc_bndl_s *bndl, t_dictionary *dict);
+void omax_dict_bundleToDictionary(t_osc_bndl_s *bndl, t_dictionary *dict, bool stripLeadingSlash);
 
 #ifdef __cplusplus
 }

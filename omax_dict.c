@@ -303,7 +303,7 @@ void omax_dict_processDictionary(void *x, t_symbol *name, void (*fp)(void *x, t_
 	//#endif
 }
 
-void omax_dict_bundleToDictionary(t_osc_bndl_s *bndl, t_dictionary *dict)
+void omax_dict_bundleToDictionary(t_osc_bndl_s *bndl, t_dictionary *dict, bool stripLeadingSlash)
 {
 	if(!bndl || !dict){
 		return;
@@ -316,7 +316,7 @@ void omax_dict_bundleToDictionary(t_osc_bndl_s *bndl, t_dictionary *dict)
 		t_atom aa[n];
 		int nn = 0;
 		omax_util_oscMsg2MaxAtoms(m, a);
-		t_symbol *k = gensym(atom_getsym(a)->s_name + 1);
+		t_symbol *k = gensym(atom_getsym(a)->s_name + stripLeadingSlash);
 		for(int i = 1; i < n; i++){
 			if(atom_gettype(a + i) == A_SYM){
 				if(!omax_dict_ps_FullPacket){
@@ -326,7 +326,7 @@ void omax_dict_bundleToDictionary(t_osc_bndl_s *bndl, t_dictionary *dict)
 					t_osc_bndl_s *bndl2 = osc_bundle_s_alloc(atom_getlong(a + i + 1),
 										 (char *)atom_getlong(a + i + 2));
 					t_dictionary *dict2 = dictionary_new();
-					omax_dict_bundleToDictionary(bndl2, dict2);
+					omax_dict_bundleToDictionary(bndl2, dict2, stripLeadingSlash);
 					atom_setobj(aa + nn++, (t_object *)dict2);
 					i += 2;
 					osc_bundle_s_free(bndl2);
