@@ -4,7 +4,7 @@ libomax is a helper library for using libo in MaxMSP objects, by John MacCallum.
 
 ## Building libomax
 # Mac
-1. Check out the following repositories (all of the above should be in the same folder):
+1. Check out the following repositories (all of the following should be in the same folder):
    * [https://github.com/CNMAT/libo](https://github.com/CNMAT/libo)
    * [https://github.com/CNMAT/libomax](https://github.com/CNMAT/libomax)
    * [https://github.com/Cycling74/max-sdk](https://github.com/Cycling74/max-sdk)
