@@ -8,6 +8,7 @@ libomax is a helper library for using libo in MaxMSP objects, by John MacCallum.
    * [https://github.com/CNMAT/libo](https://github.com/CNMAT/libo)
    * [https://github.com/CNMAT/libomax](https://github.com/CNMAT/libomax)
    * [https://github.com/Cycling74/max-sdk](https://github.com/Cycling74/max-sdk)
+   * [https://github.com/pure-data/pure-data](https://github.com/pure-data/pure-data)
    * all of the above should be in the same folder
 2. Install flex and bison
    * Compiling libo requires flex >2.5 and bison >2.4 to be installed. The OS X developer tools come with older versions of flex and bison which will not work.
@@ -60,6 +61,7 @@ On the following page, make sure `select required packages` is enabled.
 git clone https://github.com/CNMAT/libo
 git clone https://github.com/CNMAT/libomax
 git clone https://github.com/Cycling74/max-sdk
+git clone https://github.com/pure-data/pure-data
 ```
 
 ### 3. libo and libomax
