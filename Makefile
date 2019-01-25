@@ -16,7 +16,7 @@ PD_INCLUDES = ../pure-data/src
 MAC_SYSROOT = MacOSX.sdk
 #MAC-CFLAGS = -arch i386 -arch x86_64 -O3 -funroll-loops -isysroot /Users/r/Documents/dev-lib/SDKs/$(MAC_SYSROOT) -mmacosx-version-min=10.5 -std=c99
 MAC_PATH_TO_SDK = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs
-MAC-CFLAGS = -arch i386 -arch x86_64 -O3 -funroll-loops -isysroot $(MAC_PATH_TO_SDK)/$(MAC_SYSROOT) -mmacosx-version-min=10.9 -std=c99
+MAC-CFLAGS = -arch x86_64 -O3 -funroll-loops -isysroot $(MAC_PATH_TO_SDK)/$(MAC_SYSROOT) -mmacosx-version-min=10.9 -std=c99
 MAC-PD-CFLAGS = $(MAC-CFLAGS) -DOMAX_PD_VERSION
 WIN-CFLAGS = -O3 -funroll-loops -DWIN_VERSION -DWIN_EXT_VERSION -U__STRICT_ANSI__ -U__ANSI_SOURCE -std=c99 -DWIN32_LEAN_AND_MEAN # -m32
 WIN64-CFLAGS = -O3 -funroll-loops -DWIN_VERSION -DWIN_EXT_VERSION -U__STRICT_ANSI__ -U__ANSI_SOURCE -std=c99 #-fPIC

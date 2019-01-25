@@ -68,6 +68,7 @@ extern t_symbol *atom_getsym(t_atom *atom);
 extern t_atomtype atom_gettype(t_atom *atom);
 #else
 #define NUMATOMSINMESS 2
+#include "ext.h"
 #include "ext_dictionary.h"
 #include "ext_dictobj.h"
 #endif
