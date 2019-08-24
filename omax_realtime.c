@@ -27,7 +27,7 @@
 */
 
 #ifndef WIN_VERSION
-#include <Carbon/Carbon.h>
+// #include <Carbon/Carbon.h>
 #include <CoreServices/CoreServices.h>
 #else
 #include <windows.h>
