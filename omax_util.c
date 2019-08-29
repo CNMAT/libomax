@@ -113,7 +113,7 @@ t_symbol *omax_util_ps_FullPacket = NULL;
 //#define __ODOT_PROFILE__
 //#include "osc_profile.h"
 
-int omax_util_liboErrorHandler(void *context, const char * const errorstr)
+int omax_util_liboErrorHandler(void *context, t_osc_err errorcode, const char * const errorstr)
 {
 
 //  printf("%s context ->> %p err str %s \n", __func__, context, errorstr);
