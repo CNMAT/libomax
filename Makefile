@@ -46,7 +46,7 @@ win64: CFLAGS += $(WIN64-CFLAGS)
 win64: CC = x86_64-w64-mingw32-gcc
 win64: I = $(WIN64-INCLUDES)
 win64: libomax.a #libopd.a
-win64: LIBTOOL = ar cru libomax.a $(OMAX_OBJECTS)
+win64: LIBTOOL = x86_64-w64-mingw32-gcc-ar cru libomax.a $(OMAX_OBJECTS)
 win64: PLACE = rm -f libs/x86_64/*.a; mkdir -p libs/x86_64; cp libomax.a libs/x86_64
 
 linux: CC = clang

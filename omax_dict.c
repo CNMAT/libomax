@@ -62,88 +62,89 @@ static t_max_err (*omax_dict_dictobj_release)(t_dictionary *d);
 #ifdef WIN_VERSION
 int omax_dict_resolveDictStubs(void)
 {
-	//something like this, i assume
+	/* //something like this, i assume */
 
-	// A simple program that uses LoadLibrary and 
-	// GetProcAddress to access myPuts from Myputs.dll. 
+	/* // A simple program that uses LoadLibrary and  */
+	/* // GetProcAddress to access myPuts from Myputs.dll.  */
  
-	//#include <windows.h> 
-	//#include <stdio.h> 
+	/* //#include <windows.h>  */
+	/* //#include <stdio.h>  */
  
-	//typedef int (__cdecl *MYPROC)(LPWSTR); 
+	/* //typedef int (__cdecl *MYPROC)(LPWSTR);  */
  
-	//int main( void ) 
-	//{ 
-	if(omax_dict_dictStubsResolved){
-		return omax_dict_haveDict;
-	}
-	omax_dict_dictStubsResolved = 1;
-	char *dllpath = NULL;
-	short version = maxversion();
-	HINSTANCE hinstLib; 
-	//MYPROC ProcAdd; 
-	BOOL fFreeResult, fRunTimeLinkSuccess = FALSE; 
+	/* //int main( void )  */
+	/* //{  */
+	/* if(omax_dict_dictStubsResolved){ */
+	/* 	return omax_dict_haveDict; */
+	/* } */
+	/* omax_dict_dictStubsResolved = 1; */
+	/* char *dllpath = NULL; */
+	/* short version = maxversion(); */
+	/* HINSTANCE hinstLib;  */
+	/* //MYPROC ProcAdd;  */
+	/* BOOL fFreeResult, fRunTimeLinkSuccess = FALSE;  */
 
-	if((version & 0xFF0) == 0x710){
-		dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max 7\\resources\\support\\MaxAPI.dll";
-	}else if((version & 0xFF0) == 0x700){
-		dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max\\support\\MaxAPI.dll";
-	}else if((version & 0xFF0) == 0x610){
-		dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max 6.1\\support\\MaxAPI.dll";
-	}else if((version & 0xFF0) == 0x600){
-		dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max 6.0\\support\\MaxAPI.dll";
-	}else if((version & 0xF00) == 0x500){
-		return 0;
-		dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max 5.0\\support\\MaxAPI.dll";
-	}else{
-		return 0;
-	}
+	/* if((version & 0xFF0) == 0x710){ */
+	/* 	dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max 7\\resources\\support\\MaxAPI.dll"; */
+	/* }else if((version & 0xFF0) == 0x700){ */
+	/* 	dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max\\support\\MaxAPI.dll"; */
+	/* }else if((version & 0xFF0) == 0x610){ */
+	/* 	dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max 6.1\\support\\MaxAPI.dll"; */
+	/* }else if((version & 0xFF0) == 0x600){ */
+	/* 	dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max 6.0\\support\\MaxAPI.dll"; */
+	/* }else if((version & 0xF00) == 0x500){ */
+	/* 	return 0; */
+	/* 	dllpath = "C:\\Program Files (x86)\\Cycling '74\\Max 5.0\\support\\MaxAPI.dll"; */
+	/* }else{ */
+	/* 	return 0; */
+	/* } */
  
-	// Get a handle to the DLL module.
-	hinstLib = LoadLibrary(TEXT(dllpath));
+	/* // Get a handle to the DLL module. */
+	/* hinstLib = LoadLibrary(TEXT(dllpath)); */
  
-	// If the handle is valid, try to get the function address.
+	/* // If the handle is valid, try to get the function address. */
  
-	if (hinstLib != NULL) 
-		{ 
-			omax_dict_dictobj_findregistered_retain = GetProcAddress(hinstLib, "dictobj_findregistered_retain"); 
-			if(!omax_dict_dictobj_findregistered_retain){
-				return 0;
-			}
+	/* if (hinstLib != NULL)  */
+	/* 	{  */
+	/* 		omax_dict_dictobj_findregistered_retain = GetProcAddress(hinstLib, "dictobj_findregistered_retain");  */
+	/* 		if(!omax_dict_dictobj_findregistered_retain){ */
+	/* 			return 0; */
+	/* 		} */
 
-			omax_dict_dictobj_release = GetProcAddress(hinstLib, "dictobj_release"); 
-			if(!omax_dict_dictobj_release){
-				return 0;
-			}
+	/* 		omax_dict_dictobj_release = GetProcAddress(hinstLib, "dictobj_release");  */
+	/* 		if(!omax_dict_dictobj_release){ */
+	/* 			return 0; */
+	/* 		} */
 
-			omax_dict_dictobj_register = GetProcAddress(hinstLib, "dictobj_register"); 
-			if(!omax_dict_dictobj_register){
-				return 0;
-			}
-			omax_dict_haveDict = 1;
+	/* 		omax_dict_dictobj_register = GetProcAddress(hinstLib, "dictobj_register");  */
+	/* 		if(!omax_dict_dictobj_register){ */
+	/* 			return 0; */
+	/* 		} */
+	/* 		omax_dict_haveDict = 1; */
  
-			// If the function address is valid, call the function.
-			/*
-			  if (NULL != ProcAdd) 
-			  {
-			  fRunTimeLinkSuccess = TRUE;
-			  (ProcAdd) (L"Message sent to the DLL function\n"); 
-			  }
-			*/
-			// Free the DLL module.
+	/* 		// If the function address is valid, call the function. */
+	/* 		/\* */
+	/* 		  if (NULL != ProcAdd)  */
+	/* 		  { */
+	/* 		  fRunTimeLinkSuccess = TRUE; */
+	/* 		  (ProcAdd) (L"Message sent to the DLL function\n");  */
+	/* 		  } */
+	/* 		*\/ */
+	/* 		// Free the DLL module. */
  
-			fFreeResult = FreeLibrary(hinstLib); 
-		} 
+	/* 		fFreeResult = FreeLibrary(hinstLib);  */
+	/* 	}  */
 
-	// If unable to call the DLL function, use an alternative.
-	/*
-	  if (! fRunTimeLinkSuccess) 
-	  printf("Message printed from executable\n"); 
-	*/
-	return omax_dict_haveDict;
+	/* // If unable to call the DLL function, use an alternative. */
+	/* /\* */
+	/*   if (! fRunTimeLinkSuccess)  */
+	/*   printf("Message printed from executable\n");  */
+	/* *\/ */
+	/* return omax_dict_haveDict; */
 
-	//}
-	//*/
+	/* //} */
+	/* //\*\/ */
+  return 0;
 }
 #else
 int omax_dict_resolveDictStubs(void)

@@ -75,7 +75,7 @@ extern "C" {
 	}
 
   //#ifndef WIN_VERSION
-t_dictionary *(*omax_dict_dictobj_register)(t_dictionary *d, t_symbol **name);
+  //t_dictionary *(*omax_dict_dictobj_register)(t_dictionary *d, t_symbol **name);
   //#endif
 
 int omax_dict_resolveDictStubs(void);
