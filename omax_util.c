@@ -66,12 +66,12 @@ extern void atom_setsym(t_atom *atom, t_symbol *s);
 extern t_int atom_getlong(t_atom *atom);
 extern t_symbol *atom_getsym(t_atom *atom);
 extern t_atomtype atom_gettype(t_atom *atom);
-#else
+#else // not OMAX_PD_VERSION
 #define NUMATOMSINMESS 2
 #include "ext.h"
 #include "ext_dictionary.h"
 #include "ext_dictobj.h"
-#endif
+#endif // OMAX_PD_VERSION
 
 
 
@@ -116,12 +116,12 @@ t_symbol *omax_util_ps_FullPacket = NULL;
 int omax_util_liboErrorHandler(void *context, const char * const errorstr)
 {
 
-//  printf("%s context ->> %p err str %s \n", __func__, context, errorstr);
-    //printf("%s context ->> %p e\n", __func__, context);
+	//  printf("%s context ->> %p err str %s \n", __func__, context, errorstr);
+	//printf("%s context ->> %p e\n", __func__, context);
     
-  //object_error((t_object*)context, "context %p", context);
+	//object_error((t_object*)context, "context %p", context);
 
-  // stupid max window doesn't respect newlines
+	// stupid max window doesn't respect newlines
 	int len = strlen(errorstr) + 1;
 	char buf[len];
 	strncpy(buf, errorstr, len);
@@ -129,22 +129,34 @@ int omax_util_liboErrorHandler(void *context, const char * const errorstr)
 	char *s = buf;
 	char *e = buf;
     
-    int line = 0;
+	int line = 0;
 	while(*e){
 		if(*e == '\n'){
 			*e = '\0';
-            if( line == 0 )
-                object_error((t_object*)context, "%s", s);
-            else
-                error( "^    %s", s );
-            
-            line++;
+			if( line == 0 ){
+#ifdef OMAX_PD_VERSION
+				error("%s", s);
+#else
+				object_error((t_object*)context, "%s", s);
+#endif
+			}else{
+#ifdef OMAX_PD_VERSION
+				error( "^    %s", s );
+#else
+				object_error((t_object*)context, "^    %s", s);
+#endif
+			}
+			line++;
 			s = e + 1;
 		}
 		e++;
 	}
 	if(e != s){
+#ifdef OMAX_PD_VERSION
 		error( "^    %s", s );
+#else
+		object_error((t_object*)context, "^    %s", s);
+#endif
 	}
 	return 0;
 }
@@ -234,13 +246,13 @@ int omax_util_getNumAtomsInOSCMsg(t_osc_msg_s *m)
 
 int omax_util_braceError(char *s)
 {
-    int i, len = strlen(s);
-    for( i = 0; i < len; i++ )
-    {
-        if(s[i] == '{' || s[i] == '}')
-            return 1;
-    }
-    return 0;
+	int i, len = strlen(s);
+	for( i = 0; i < len; i++ )
+		{
+			if(s[i] == '{' || s[i] == '}')
+				return 1;
+		}
+	return 0;
 }
 
 void omax_util_hashBrackets2Curlies(char *s)
@@ -251,20 +263,20 @@ void omax_util_hashBrackets2Curlies(char *s)
 
 	int i, j = 0;
 	for( i = 0; i < len; i++ )
-    {
-        c = s[i];
-        if( i < len-1 )
-        {
-            if(s[i] == '#' && s[i+1] == '['){
-                c = '{';
-                i++;
-            } else if(s[i] == ']' && s[i+1] == '#') {
-                c = '}';
-                i++;
-            }
-        }
-        s[j++] = c;
-    }
+		{
+			c = s[i];
+			if( i < len-1 )
+				{
+					if(s[i] == '#' && s[i+1] == '['){
+						c = '{';
+						i++;
+					} else if(s[i] == ']' && s[i+1] == '#') {
+						c = '}';
+						i++;
+					}
+				}
+			s[j++] = c;
+		}
 
 	while(j < len)
 		s[j++] = '\0';
@@ -277,10 +289,10 @@ void omax_util_curlies2hashBrackets(char **ptr, long bufsize)
 
 	char *str = (*ptr);
 	if(!str)
-    {
-        error("no string in buffer");
-        return;
-    }
+		{
+			error("no string in buffer");
+			return;
+		}
 
 	int i, j = 0;
 	int len = strlen(str);
@@ -288,26 +300,26 @@ void omax_util_curlies2hashBrackets(char **ptr, long bufsize)
 	memset(buf, '\0', len * 2);
 
 	for( i = 0; i < len; i++ )
-    {
-        if (str[i] == '{')
-        {
-            buf[j++] = '#';
-            buf[j++] = '[';
-        }
-        else if (str[i] == '}')
-        {
-            buf[j++] = ']';
-            buf[j++] = '#';
-        } else {
-            buf[j++] = str[i];
-        }
-    }
+		{
+			if (str[i] == '{')
+				{
+					buf[j++] = '#';
+					buf[j++] = '[';
+				}
+			else if (str[i] == '}')
+				{
+					buf[j++] = ']';
+					buf[j++] = '#';
+				} else {
+				buf[j++] = str[i];
+			}
+		}
 	if(j != i)
-    {
-        memset(*ptr, '\0', bufsize);
-        //        *ptr = (char *)realloc(*ptr, sizeof(char) * j);
-        strcpy(*ptr, buf);
-    }
+		{
+			memset(*ptr, '\0', bufsize);
+			//        *ptr = (char *)realloc(*ptr, sizeof(char) * j);
+			strcpy(*ptr, buf);
+		}
 }
 
 
@@ -351,16 +363,16 @@ int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 				char *bufptr = buf;
 				osc_atom_s_getString(a, len + 1, &bufptr);
 #ifdef OMAX_PD_VERSION
-                int maxsize = (len * 2) + 1; // maximum possible size if all characters are {} + \0
-                char extrabuf[maxsize];
-                strcpy(extrabuf, bufptr);
-                char *pdbufptr = extrabuf;
-                omax_util_curlies2hashBrackets(&pdbufptr, maxsize);
+				int maxsize = (len * 2) + 1; // maximum possible size if all characters are {} + \0
+				char extrabuf[maxsize];
+				strcpy(extrabuf, bufptr);
+				char *pdbufptr = extrabuf;
+				omax_util_curlies2hashBrackets(&pdbufptr, maxsize);
 
-                if(omax_util_braceError(pdbufptr))
-                    return 1;
+				if(omax_util_braceError(pdbufptr))
+					return 1;
 
-                atom_setsym(ptr++, gensym(extrabuf));
+				atom_setsym(ptr++, gensym(extrabuf));
 #else
 				atom_setsym(ptr++, gensym(buf));
 #endif
@@ -399,7 +411,7 @@ int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 		}
 	}
 	osc_msg_it_s_destroy(it);
-    return 0;
+	return 0;
 }
 
 // encode a FullPacket <len> <ptr> message as a nested bundle
@@ -409,17 +421,17 @@ void omax_util_maxFullPacketToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *len, t_
 		*osc_atom = osc_atom_u_alloc();
 	}
 #ifdef OMAX_PD_VERSION
-    float ff = atom_getfloat(len);
-    long l = (long)*((uint32_t *)&ff);
-    ff = atom_getfloat(ptr);
-    uint64_t l1 = *((uint64_t *)&ff);
-    l1 <<= 32;
-    ff = atom_getfloat(ptr+1);
-    uint64_t l2 = *((uint64_t *)&ff);
-    char *p = (char *)(l1 | l2);
+	float ff = atom_getfloat(len);
+	long l = (long)*((uint32_t *)&ff);
+	ff = atom_getfloat(ptr);
+	uint64_t l1 = *((uint64_t *)&ff);
+	l1 <<= 32;
+	ff = atom_getfloat(ptr+1);
+	uint64_t l2 = *((uint64_t *)&ff);
+	char *p = (char *)(l1 | l2);
 #else
-    long l = atom_getlong(len);
-    char *p = (char *)atom_getlong(ptr);
+	long l = atom_getlong(len);
+	char *p = (char *)atom_getlong(ptr);
 #endif
 	osc_atom_u_setBndl(*osc_atom, l, p);
 }
@@ -462,14 +474,14 @@ void omax_util_maxAtomToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *max_atom)
 		{
 #ifdef OMAX_PD_VERSION
 			t_symbol *sym = atom_getsym(max_atom);
-            if(sym && sym->s_name)
-            {
-                char buf[ strlen(sym->s_name) + 1 ];
-                strcpy(buf, sym->s_name);
-                omax_util_hashBrackets2Curlies(buf);
-                osc_atom_u_setString(*osc_atom, buf);
-                break;
-            }
+			if(sym && sym->s_name)
+				{
+					char buf[ strlen(sym->s_name) + 1 ];
+					strcpy(buf, sym->s_name);
+					omax_util_hashBrackets2Curlies(buf);
+					osc_atom_u_setString(*osc_atom, buf);
+					break;
+				}
 #else
 			t_symbol *s = atom_getsym(max_atom);
 			if(s && s->s_name){
@@ -477,7 +489,7 @@ void omax_util_maxAtomToOSCAtom_u(t_osc_atom_u **osc_atom, t_atom *max_atom)
 				break;
 			}
 #endif						\
-			// intentional fall-through to default
+	// intentional fall-through to default
 		}
 	default:
 		osc_atom_u_free(*osc_atom);
