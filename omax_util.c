@@ -135,13 +135,13 @@ int omax_util_liboErrorHandler(void *context, const char * const errorstr)
 			*e = '\0';
 			if( line == 0 ){
 #ifdef OMAX_PD_VERSION
-				error("%s", s);
+				pd_error(context, "%s", s);
 #else
 				object_error((t_object*)context, "%s", s);
 #endif
 			}else{
 #ifdef OMAX_PD_VERSION
-				error( "^    %s", s );
+				pd_error(context, "^    %s", s );
 #else
 				object_error((t_object*)context, "^    %s", s);
 #endif
@@ -153,7 +153,7 @@ int omax_util_liboErrorHandler(void *context, const char * const errorstr)
 	}
 	if(e != s){
 #ifdef OMAX_PD_VERSION
-		error( "^    %s", s );
+		pd_error(context, "^    %s", s );
 #else
 		object_error((t_object*)context, "^    %s", s);
 #endif
@@ -244,6 +244,7 @@ int omax_util_getNumAtomsInOSCMsg(t_osc_msg_s *m)
 	return n;
 }
 
+#ifdef OMAX_PD_VERSION
 int omax_util_braceError(char *s)
 {
 	int i, len = strlen(s);
@@ -290,7 +291,7 @@ void omax_util_curlies2hashBrackets(char **ptr, long bufsize)
 	char *str = (*ptr);
 	if(!str)
 		{
-			error("no string in buffer");
+			pd_error(NULL, "no string in buffer");
 			return;
 		}
 
@@ -321,8 +322,7 @@ void omax_util_curlies2hashBrackets(char **ptr, long bufsize)
 			strcpy(*ptr, buf);
 		}
 }
-
-
+#endif
 
 int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 {
@@ -407,7 +407,11 @@ int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av)
 			}
 			break;
 		default:
-			error("unknown OSC type %c (%d)\n", osc_atom_s_getTypetag(a), osc_atom_s_getTypetag(a));
+#ifdef OMAX_PD_VERSION
+			pd_error(NULL, "unknown OSC type %c (%d)\n", osc_atom_s_getTypetag(a), osc_atom_s_getTypetag(a));
+#else
+            error("unknown OSC type %c (%d)\n", osc_atom_s_getTypetag(a), osc_atom_s_getTypetag(a));
+#endif
 		}
 	}
 	osc_msg_it_s_destroy(it);

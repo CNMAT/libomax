@@ -58,17 +58,17 @@ t_omax_pd_proxy *omax_pd_proxynew(t_object *x, long inletnum, long *inletloc, t_
 	return p;
 }
 
-t_gotfn omax_pd_getfunctionforsymbol(t_object *x, t_symbol *msg)
+void *omax_pd_getfunctionforsymbol(t_object *x, t_symbol *msg)
 {
 	t_omax_pd_proxy_class *c = ((t_omax_pd_proxy *)x)->class;
 	void *f = osc_hashtab_lookup(c->ht, strlen(msg->s_name), msg->s_name);
-	return (t_gotfn)f;
+	return f;
 }
 
 void omax_pd_proxydispatchmethod(t_object *xx, t_symbol *msg, int argc, t_atom *argv)
 {
 	t_omax_pd_proxy *x = (t_omax_pd_proxy *)xx;
-	t_gotfn f = omax_pd_getfunctionforsymbol(xx, msg);
+	void (*f)(t_object *, t_symbol *, int, t_atom *) = (void (*)(t_object *, t_symbol *, int, t_atom *))omax_pd_getfunctionforsymbol(xx, msg);
 	if(f){
 		*(x->inletloc) = x->inletnum;
 		f(x->x, msg, argc, argv);
@@ -79,7 +79,7 @@ void omax_pd_proxydispatchmethod(t_object *xx, t_symbol *msg, int argc, t_atom *
 void omax_pd_proxydispatchanything(t_object *xx, t_symbol *msg, int argc, t_atom *argv)
 {
 	t_omax_pd_proxy *x = (t_omax_pd_proxy *)xx;
-	t_gotfn f = omax_pd_getfunctionforsymbol(xx, gensym("anything"));
+	void (*f)(t_object *, t_symbol *, int, t_atom *) = (void (*)(t_object *, t_symbol *, int, t_atom *))omax_pd_getfunctionforsymbol(xx, gensym("anything"));
 	if(f){
 		*(x->inletloc) = x->inletnum;
 		f(x->x, msg, argc, argv);
@@ -91,7 +91,7 @@ void omax_pd_proxydispatchanything(t_object *xx, t_symbol *msg, int argc, t_atom
 void omax_pd_proxydispatchfloat(t_object *xx, t_float ff)
 {
 	t_omax_pd_proxy *x = (t_omax_pd_proxy *)xx;
-	t_gotfn f = omax_pd_getfunctionforsymbol(xx, gensym("float"));
+	void (*f)(t_object *, double) = (void (*)(t_object *, double))omax_pd_getfunctionforsymbol(xx, gensym("float"));
 	if(f){
 		*(x->inletloc) = x->inletnum;
 		f(x->x, (double)ff);
@@ -101,7 +101,7 @@ void omax_pd_proxydispatchfloat(t_object *xx, t_float ff)
 void omax_pd_proxydispatchsymbol(t_object *xx, t_symbol *msg)
 {
 	t_omax_pd_proxy *x = (t_omax_pd_proxy *)xx;
-	t_gotfn f = omax_pd_getfunctionforsymbol(xx, gensym("symbol"));
+	void (*f)(t_object *, t_symbol *) = (void (*)(t_object *, t_symbol *))omax_pd_getfunctionforsymbol(xx, gensym("symbol"));
 	if(f){
 		*(x->inletloc) = x->inletnum;
 		f(x->x, msg);
@@ -112,7 +112,7 @@ void omax_pd_proxydispatchsymbol(t_object *xx, t_symbol *msg)
 void omax_pd_proxydispatchbang(t_object *xx)
 {
 	t_omax_pd_proxy *x = (t_omax_pd_proxy *)xx;
-	t_gotfn f = omax_pd_getfunctionforsymbol(xx, gensym("bang"));
+	void (*f)(t_object *) = (void (*)(t_object *))omax_pd_getfunctionforsymbol(xx, gensym("bang"));
 	if(f){
 		*(x->inletloc) = x->inletnum;
 		f(x->x);
