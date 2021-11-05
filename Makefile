@@ -8,7 +8,7 @@ OPD_OBJECTS = $(foreach OBJ, $(OPD_BASENAMES), $(OBJ)_libopd.o)
 OPD_CFILES = $(foreach F, $(OPD_BASENAMES), $(F).c)
 OPD_HFILES = $(foreach F, $(OPD_BASENAMES), $(F).h)
 
-C74SUPPORT = ../max-sdk/source/c74support
+C74SUPPORT = ../max-sdk-base/c74support
 MAX_INCLUDES = $(C74SUPPORT)/max-includes
 MSP_INCLUDES = $(C74SUPPORT)/msp-includes
 PD_INCLUDES = ../pure-data/src

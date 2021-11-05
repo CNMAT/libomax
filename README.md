@@ -14,7 +14,7 @@ which are necessary to build the odot objects.
 ### Prerequisites for all platforms
 
 * You need the appropriate SDK(s) for the platform you want to target:
-	* Max: [https://github.com/cycling74/max-sdk](https://github.com/cycling74/max-sdk)
+	* Max: [https://github.com/cycling74/max-sdk-base](https://github.com/cycling74/max-sdk-base)
 	* PD: [https://github.com/pure-data/pure-data](https://github.com/pure-data/pure-data)
 * [https://github.com/CNMAT/libo](https://github.com/CNMAT/libo)
 	* See the libo documentation for build instructions

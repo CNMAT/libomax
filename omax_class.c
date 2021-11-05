@@ -216,7 +216,8 @@ void omax_FullPacketCallback(t_osc_msg_s *msg, void *context)
 							method f = object_attr_method(c->ob, m->sym, (void **)(&attr), &get);
 							t_atom argv[msg_argc + 1];
 							omax_util_oscMsg2MaxAtoms(msg, argv);
-							f(c->ob, attr, msg_argc, argv + 1);
+							//f(c->ob, attr, msg_argc, argv + 1);
+                            CALL_METHOD(f, c->ob, attr, &msg_argc, argv + 1);
 							c->should_output_state = 1;
 						}
 						break;
@@ -473,7 +474,8 @@ void omax_object_createIOReport(t_object *x, t_symbol *msg, int argc, t_atom *ar
 							long get;
 							method f = object_attr_method(x, gensym(getter), (void **)(&attr), &get);
 							if(f){
-								f(x, attr, &argc, &argv);
+								//f(x, attr, &argc, &argv);
+                                CALL_METHOD(f, x, attr, &argc, &argv);
 								if(argv){
 									char address[128];
 									sprintf(address, "/%s", m->sym->s_name);
@@ -548,7 +550,8 @@ void omax_outputState(t_object *x)
 			long get;
 			method f = object_attr_method(x, gensym(getter), (void **)(&attr), &get);
 			if(f){
-				f(x, attr, &argc, &argv);
+				//f(x, attr, &argc, &argv);
+                CALL_METHOD(f, x, attr, &argc, &argv);
 				if(argv){
 					char address[128];
 					sprintf(address, "/%s", m->sym->s_name);
