@@ -455,6 +455,10 @@ void omax_object_createIOReport(t_object *x, t_symbol *msg, int argc, t_atom *ar
 					int ao, po;
 					if(atom_getsym(a) == gensym("/*")){
 						ret = OSC_MATCH_ADDRESS_COMPLETE;
+
+
+
+
 					}else{
 						ret = osc_match(atom_getsym(a)->s_name, keys[i]->s_name, &po, &ao);
 					}
@@ -530,6 +534,8 @@ void omax_outputState(t_object *x)
 
 	t_osc_bndl_u *bndl_u = osc_bundle_u_alloc();
 	int i;
+
+
 	for(i = 0; i < nkeys; i++){
 		if(osc_error_validateAddress(keys[i]->s_name)){
 			continue;
