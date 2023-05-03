@@ -77,7 +77,7 @@ t_osc_err omax_util_maxAtomsToOSCMsg_u(t_osc_msg_u **msg, t_symbol *address, int
 int omax_util_getNumAtomsInOSCMsg(t_osc_msg_s *msg);
 int omax_util_oscMsg2MaxAtoms(t_osc_msg_s *m, t_atom *av);
 
-int omax_util_liboErrorHandler(void *context, const char * const errorstr);
+int omax_util_liboErrorHandler(void *context, t_osc_err errorcode, const char * const errorstr);
 
 t_osc_err omax_util_copyBundleWithSubs_u(t_osc_bndl_u **dest, t_osc_bndl_u *src, int argc, t_atom *argv, int *hassubs);
 
