@@ -232,7 +232,7 @@ void omax_dict_dictionaryToOSC(t_dictionary *dict, t_osc_bndl_u *bndl_u)
 	}
 	long nkeys = 0;
 	t_symbol **keys = NULL;
-	dictionary_getkeys(dict, &nkeys, &keys);
+	dictionary_getkeys_ordered(dict, &nkeys, &keys);
 	if(nkeys && keys){
 		for(int i = 0; i < nkeys; i++){
 			char *key = keys[i]->s_name;
